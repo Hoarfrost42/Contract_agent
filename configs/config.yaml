@@ -1,0 +1,27 @@
+llm_config:
+  provider: "ollama"
+  base_url: "http://localhost:11434"
+  model_name: "qwen3:4b-instruct"
+  temperature: 0
+
+llm_cloud_config:
+  provider: "ollama"
+  # 注意：端口变成了 11435 (对应 SSH 隧道)
+  base_url: "http://localhost:11435" 
+  # 注意：这里不需要 https，也不需要 ngrok header，因为 SSH 也是本地协议
+  # 确保名字和云端下载的一致 (如 qwen3:4b 或 qwen2.5:7b)
+  model_name: "deepseek-chat"
+  temperature: 0.1
+  max_tokens: 2000
+
+embedding_config:
+  model_path: "C:\\Users\\Lenovo\\.cache\\huggingface\\hub\\models--BAAI--bge-small-zh-v1.5\\snapshots\\7999e1d3359715c523056ef9478215996d62a620"
+
+system_config:
+  max_concurrency: 5 # Limit parallel LLM calls
+
+# 混合检索配置
+hybrid_search_config:
+  alpha: 0.65  # Dense Score 权重 (1-alpha 为 Sparse Score 权重)
+  threshold: 0.75  # 相似度阈值，低于此值的匹配将被过滤
+  top_k: 3  # Top-K 规则数量：传递给 LLM 的候选规则数量（仅超过阈值的规则）

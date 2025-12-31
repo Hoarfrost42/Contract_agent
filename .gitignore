@@ -1,0 +1,62 @@
+# 虚拟环境
+.venv/
+venv/
+env/
+
+# Python 缓存
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# 敏感配置
+.env
+.env.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 临时文件
+temp_reports/
+temp_uploads/
+
+# 旧框架配置
+.streamlit/
+
+# 数据库缓存
+*.db-journal
+
+# 周报和个人文档
+*_weekly_report.md
+*.docx
+
+# 测试和一次性脚本
+test_*.py
+import_processed_laws.py
+process_law_text.py
+
+# 中间数据文件（根目录）
+GENERAL.json
+LABOR.json
+LEASE.json
+SALES.json
+
+# 评测数据（可选上传）
+Evaldata/
+
+# 辅助脚本
+scripts/
+
+# 技术评审文档（可选）
+Review.md
+KEY_CODE_IMPLEMENTATION.md
+OPTIMIZATION_GUIDE.md
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db

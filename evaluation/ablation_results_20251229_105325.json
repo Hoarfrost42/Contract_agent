@@ -1,0 +1,762 @@
+{
+  "mode_1": {
+    "mode": 1,
+    "mode_name": "纯LLM (Raw)",
+    "metrics": {
+      "total": 10,
+      "accuracy": 0.6,
+      "precision": 0.6667,
+      "recall": 1.0,
+      "f1": 0.8,
+      "parse_rate": 0.9,
+      "hallucination_rate": 0.1,
+      "risk_id_accuracy": 1.0,
+      "avg_latency_sec": 12.738,
+      "reason_quality": 0.6
+    },
+    "results": [
+      {
+        "id": "SALES_021_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "货物应采用坚固、防潮、防锈、防震的包装，适应长途运输和多次搬运，确保货物安全无损运抵目的地。",
+          "analysis": "该条款虽表达了对包装质量的基本要求，但“坚固”“防潮”“防锈”“防震”等描述过于笼统，未明确具体标准（如材质、厚度、测试方法、行业规范等），导致实际操作中难以判断是否符合要求。同时，“适应长途运输和多次搬运”属于功能描述，缺乏量化指标，易引发争议。若发生货物损坏，买方可能无法有效主张责任，卖方也可能以“符合一般标准”为由抗辩，从而引发履约争议或纠纷。",
+          "parse_success": true,
+          "latency": 13.225
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "LEASE_023_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "甲方有权随时单方变更收款账户或要求乙方改为现金支付，乙方应无条件配合，否则视为逾期付款。",
+          "analysis": "该条款赋予甲方单方面变更收款账户或要求现金支付的绝对权力，且未设定合理程序或通知义务，违反了合同支付条款的稳定性与可预期性原则。乙方“无条件配合”构成强制性义务，若甲方未提前合理通知或变更理由不充分，乙方实际履行支付义务将面临重大障碍。更严重的是，“否则视为逾期付款”可能被滥用，导致乙方因无法实际履行支付义务而被错误认定为违约，进而引发违约责任、滞纳金甚至诉讼风险。此类条款严重偏离公平原则，易引发争议，且在司法实践中可能被认定为格式条款无效或显失公平。",
+          "parse_success": true,
+          "latency": 13.987
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "租金支付方式变更"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_031_neg_1",
+        "prediction": {
+          "risk_level": "未知",
+          "evidence": "甲方支付给乙方的月工资不低于甲方所在地的最低工资标准。如遇政府调整最低工资标准，甲方将相应调整乙方的工资，确保符合法律规定。",
+          "analysis": "该条款虽表面符合最低工资标准的法律规定，但未明确“甲方所在地”具体指代何地（是乙方工作地、甲方注册地还是办公地），可能导致实际执行中产生争议。此外，“甲方将相应调整”属于承诺性表述，未明确调整的时效、程序或责任承担，若甲方因经营困难、财务状况变化等原因延迟或拒绝调整，乙方可能面临工资低于法定标准的风险。同时，该条款未体现乙方是否享有知情权或异议权，也未说明调整是否需经乙方同意，存在执行不透明、不合规的隐患。",
+          "parse_success": false,
+          "latency": 10.907
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "LEASE_001_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "如房屋有人为损坏，双方协商确定维修费用后从押金中扣除。",
+          "analysis": "该条款将“人为损坏”作为押金扣除的前提，但未明确“人为损坏”的定义、举证责任、判断标准及争议解决机制。在实际履行中，可能因双方对“损坏”存在分歧，导致争议无法及时解决，甚至引发纠纷。同时，“协商确定”缺乏程序保障，易被一方利用，形成不平等地位。此外，若房屋自然损耗或正常使用中的磨损被归为“人为损坏”，则可能构成对租户的不合理追责，违反公平原则。",
+          "parse_success": true,
+          "latency": 10.825
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_008_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "乙方若不能胜任工作，甲方将对乙方进行培训或调整工作岗位。若经培训或调岗后仍不能胜任工作的，甲方可以解除劳动合同，并依法支付经济补偿。",
+          "analysis": "该条款虽形式上符合《劳动合同法》关于“不能胜任工作”解除劳动合同的规定，但实际执行中存在重大风险。首先，“不能胜任工作”属于主观判断，缺乏明确标准和客观依据，易被滥用；其次，用人单位在未提供具体绩效考核记录、岗位职责说明或培训记录的情况下，单方面认定“不能胜任”，可能构成事实认定不清，违反“举证责任”原则。此外，若未履行“培训或调岗”程序，或调岗后仍不胜任却未进行充分评估，可能被认定为未履行法定程序，进而被认定为违法解除劳动合同。因此，该条款在实际操作中极易引发劳动争议，且缺乏可操作性与透明度。",
+          "parse_success": true,
+          "latency": 12.707
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "SALES_020_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "买方应在合同签订后3日内，向卖方支付合同总价款的100%作为预付款。卖方在收到全额货款后方安排生产及发货。",
+          "analysis": "该条款规定买方需在合同签订后3日内支付100%合同总价款作为预付款，卖方仅在收到全额货款后才开始生产及发货。此安排对买方极为不利，因为一旦买方支付全款，即丧失后续协商或变更合同的权利，且若卖方因自身原因无法按时生产或交付，买方将面临无法获得货物的损失。同时，该条款未设定明确的生产周期、交付时间或违约责任，导致卖方可能利用“收到货款后才生产”作为拖延或拒绝履行的借口，构成实质性的履约风险。此外，买方在支付全款前，无法获得卖方对产品规格、质量、交期等关键内容的实质性确认，存在信息不对称风险。",
+          "parse_success": true,
+          "latency": 13.959
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "预付款比例过高"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      },
+      {
+        "id": "LEASE_020_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "乙方需自行解决居住所需的设施设备。合同终止时，乙方自行添置的物品由乙方自行搬离。",
+          "analysis": "该条款将房屋交付时的家具、家电全部排除，要求乙方自行购置所有生活设施，且在合同终止时需自行搬离所有添置物品。此类安排可能在实际履行中导致乙方因缺乏基础生活设施而无法正常居住，尤其对老年人、孕妇、残障人士或首次购房群体而言，使用门槛过高。同时，合同终止后“自行搬离”义务未明确责任边界，若乙方因客观原因（如搬迁困难、物品损坏）无法及时搬离，可能面临财产损失或被认定为违约。该条款实质上将重大生活成本与风险完全转嫁给乙方，明显违背《民法典》关于公平原则与诚实信用原则的规范要求，存在显失公平之虞。",
+          "parse_success": true,
+          "latency": 14.391
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "配套设施不交付"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_008_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "公司实行严格的绩效考核制度，每季度对员工进行排名。处于考核排名末位（最后5%）的员工，将被视为不胜任工作，公司有权直接解除劳动合同。",
+          "analysis": "该条款将“末位5%”直接等同于“不胜任工作”，存在重大法律风险。根据《劳动合同法》第39条，用人单位仅能在员工“不能胜任工作”且经培训或调整岗位仍不能胜任的情况下，方可解除劳动合同。而“末位排名”属于绩效结果，不等同于“不能胜任工作”。若未提供具体岗位职责、工作标准、考核依据及客观证据，仅以排名作为判断标准，极易被认定为“以排名代替能力判断”，属于主观、模糊、缺乏合理性的标准，违反“合理必要”原则。此外，末位排名可能受偶然因素影响（如临时任务、个人状态等），且未体现对员工的改进机会，不符合“先培训、后解除”的法定程序，可能构成违法解除。",
+          "parse_success": true,
+          "latency": 13.05
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "末位淘汰陷阱"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      },
+      {
+        "id": "LEASE_012_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "甲方不对租赁房屋的权属状况及是否存在权利负担（包括但不限于查封、抵押等）作出任何保证。若因房屋产权瑕疵或被司法机关查封导致乙方无法继续居住的，甲方仅退还剩余租金，不承担其他违约责任。",
+          "analysis": "该条款将房屋权属瑕疵或被查封等重大风险完全转嫁给乙方，且仅允许甲方退还剩余租金，未涵盖实际损失（如搬迁费、装修损失、误工费、精神损害等），明显违反公平原则。根据《民法典》第七百零三条，出租人应确保租赁物适格，若房屋存在权属瑕疵或被查封，出租人应承担相应责任。若房屋被查封，租赁合同通常视为无效或可解除，乙方有权要求解除合同并获得合理赔偿。本条款剥夺了乙方的合同解除权和损害赔偿请求权，构成显失公平的格式条款，可能被认定为无效。",
+          "parse_success": true,
+          "latency": 13.97
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "房屋查封抵押未披露"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_040_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "“双方同意直接向甲方所在地人民法院提起诉讼，并放弃向劳动争议仲裁委员会申请仲裁的权利”",
+          "analysis": "根据《中华人民共和国劳动争议调解仲裁法》第二条，劳动争议包括因劳动合同、劳动报酬、工伤医疗费、经济补偿或赔偿金等发生的纠纷，此类争议必须先经劳动争议仲裁委员会仲裁，仲裁是诉讼的前置程序。合同中约定“放弃向劳动争议仲裁委员会申请仲裁的权利”，实质上剥夺了劳动者依法享有的仲裁权利，违反了法律规定的强制性程序，可能导致该条款无效。此外，劳动者作为弱势一方，若在合同中被剥夺仲裁权利，将严重损害其合法权益，属于显失公平的格式条款。",
+          "parse_success": true,
+          "latency": 10.363
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "限制争议解决权利"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": false
+      }
+    ]
+  },
+  "mode_2": {
+    "mode": 2,
+    "mode_name": "基础Prompt",
+    "metrics": {
+      "total": 10,
+      "accuracy": 0.6,
+      "precision": 0.6,
+      "recall": 1.0,
+      "f1": 0.75,
+      "parse_rate": 1.0,
+      "hallucination_rate": 0.0,
+      "risk_id_accuracy": 1.0,
+      "avg_latency_sec": 6.822,
+      "reason_quality": 0.6
+    },
+    "results": [
+      {
+        "id": "SALES_021_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「坚固、防潮、防锈、防震的包装，适应长途运输和多次搬运」",
+          "analysis": "条款未明确包装材质、规格、检测标准或验收方式，易导致履约争议，买方难以验证是否符合要求，存在实际履行与责任划分风险。",
+          "parse_success": true,
+          "latency": 6.48
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "LEASE_023_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「甲方有权随时单方变更收款账户或要求乙方改为现金支付，乙方应无条件配合，否则视为逾期付款。」",
+          "analysis": "该条款赋予甲方单方面变更收款方式的权利，且要求乙方无条件配合，严重违反合同对支付方式的稳定性与可预期性要求，构成对乙方基本权利的剥夺。",
+          "parse_success": true,
+          "latency": 7.26
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "租金支付方式变更"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_031_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「甲方将相应调整乙方的工资，确保符合法律规定」",
+          "analysis": "条款未明确“调整”机制与时间框架，可能导致甲方延迟或拒绝调整，实际执行缺乏保障，存在违反最低工资标准的风险。",
+          "parse_success": true,
+          "latency": 5.908
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "LEASE_001_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「如房屋有人为损坏，双方协商确定维修费用后从押金中扣除。」",
+          "analysis": "未明确“人为损坏”的认定标准和“协商”过程，易导致双方争议，且缺乏具体举证责任和程序，存在违约风险。",
+          "parse_success": true,
+          "latency": 6.382
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_008_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「若经培训或调岗后仍不能胜任工作的，甲方可以解除劳动合同」",
+          "analysis": "条款未明确“不能胜任”的认定标准，易导致主观判断，可能被认定为未履行合理程序，构成违法解除。",
+          "parse_success": true,
+          "latency": 5.784
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "SALES_020_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「买方应在合同签订后3日内，向卖方支付合同总价款的100%作为预付款。卖方在收到全额货款后方安排生产及发货。」",
+          "analysis": "买方需在极短时间内支付全款，且卖方以收到全款为前提安排生产，导致买方资金压力巨大，且若买方后续无法履行，卖方可能面临无法交付的风险，双方权利义务严重失衡。",
+          "parse_success": true,
+          "latency": 8.687
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "预付款比例过高"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      },
+      {
+        "id": "LEASE_020_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「房屋内不配备家具、家电。乙方需自行解决居住所需的设施设备。合同终止时，乙方自行添置的物品由乙方自行搬离。」",
+          "analysis": "条款将全部居住设施责任转嫁给乙方，未明确甲方交付标准，可能构成交付不充分，违反《民法典》第595条关于“交付应满足合理使用条件”的规定。",
+          "parse_success": true,
+          "latency": 7.576
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "配套设施不交付"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_008_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「处于考核排名末位（最后5%）的员工，将被视为不胜任工作，公司有权直接解除劳动合同。」",
+          "analysis": "末位排名不等同于“不胜任工作”，且未设置整改期或证据证明，直接解除违反《劳动合同法》第四十条关于“不胜任工作”的法定程序。",
+          "parse_success": true,
+          "latency": 6.668
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "末位淘汰陷阱"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      },
+      {
+        "id": "LEASE_012_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「甲方不对租赁房屋的权属状况及是否存在权利负担（包括但不限于查封、抵押等）作出任何保证。若因房屋产权瑕疵或被司法机关查封导致乙方无法继续居住的，甲方仅退还剩余租金，不承担其他违约责任。」",
+          "analysis": "该条款将房屋权属风险完全转嫁给乙方，且违约责任仅限于退租，明显违反公平原则，构成对乙方基本居住权的剥夺。",
+          "parse_success": true,
+          "latency": 7.728
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "房屋查封抵押未披露"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_040_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「放弃向劳动争议仲裁委员会申请仲裁的权利」",
+          "analysis": "根据《劳动争议调解仲裁法》，劳动争议必须先经仲裁，方可诉讼，当事人不得自行放弃仲裁权利。",
+          "parse_success": true,
+          "latency": 5.744
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "限制争议解决权利"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      }
+    ]
+  },
+  "mode_3": {
+    "mode": 3,
+    "mode_name": "当前工作流",
+    "metrics": {
+      "total": 10,
+      "accuracy": 0.7,
+      "precision": 0.75,
+      "recall": 1.0,
+      "f1": 0.8571,
+      "parse_rate": 0.9,
+      "hallucination_rate": 0.0,
+      "risk_id_accuracy": 1.0,
+      "avg_latency_sec": 7.801,
+      "reason_quality": 0.5
+    },
+    "results": [
+      {
+        "id": "SALES_021_neg_1",
+        "prediction": {
+          "risk_level": "未知",
+          "evidence": "「货物应采用坚固、防潮、防锈、防震的包装，适应长途运输和多次搬运，确保货物安全无损运抵目的地。」",
+          "analysis": "条款虽提出包装要求，但未明确具体标准（如材料、结构、检测方式），缺乏可执行性，易引发运输中损坏责任归属争议。",
+          "parse_success": false,
+          "latency": 7.553
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "LEASE_023_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「甲方有权随时单方变更收款账户或要求乙方改为现金支付」",
+          "analysis": "条款中“单方变更”“要求改为现金支付”缺乏双方协商机制，乙方无异议权，易导致付款错误或履约障碍，违反合同稳定性原则。",
+          "parse_success": true,
+          "latency": 6.49
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "租金支付方式变更"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_031_neg_1",
+        "prediction": {
+          "risk_level": "低",
+          "evidence": "「甲方支付给乙方的月工资不低于甲方所在地的最低工资标准」",
+          "analysis": "条款明确约定工资不低于最低标准，符合法定要求，未出现“单方调整”或“福利抵扣”等规避行为，主体结构清晰，保障充分。",
+          "parse_success": true,
+          "latency": 6.632
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      },
+      {
+        "id": "LEASE_001_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「如房屋有人为损坏，双方协商确定维修费用后从押金中扣除」",
+          "analysis": "条款将房屋人为损坏的维修责任及费用扣除义务完全交由乙方承担，未明确维修责任归属，违反《民法典》第708条关于租赁物维修义务的公平原则，构成对租客权益的不合理剥夺。",
+          "parse_success": true,
+          "latency": 7.76
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_008_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「乙方若不能胜任工作，甲方将对乙方进行培训或调整工作岗位。若经培训或调岗后仍不能胜任工作的，甲方可以解除劳动合同」",
+          "analysis": "条款未明确“不能胜任工作”的认定标准，若将“末位排名”视为“不能胜任”，则属于将绩效排名直接等同于能力不足，违反《劳动合同法》第40条关于“不能胜任工作”须有客观证据和合理程序的要求。",
+          "parse_success": true,
+          "latency": 8.126
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "SALES_020_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「买方应在合同签订后3日内，向卖方支付合同总价款的100%作为预付款」",
+          "analysis": "条款要求买方支付100%合同总价款作为预付款，属于极端高额预付，买方在未获得任何交付或质量保障前即承担全部资金风险，极易遭遇卖方违约、破产或“跑路”情形，严重失衡交易结构。",
+          "parse_success": true,
+          "latency": 8.508
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "预付款比例过高"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      },
+      {
+        "id": "LEASE_020_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「乙方需自行解决居住所需的设施设备」",
+          "analysis": "条款将房屋内家具家电缺失及后续设施设备责任完全归于乙方，实质等同于将房屋自然损耗与基础居住设施的维修义务转嫁租客，违背《民法典》第708条关于租赁物适租性的基本要求，显失公平。",
+          "parse_success": true,
+          "latency": 7.944
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "配套设施不交付"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_008_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「处于考核排名末位（最后5%）的员工，将被视为不胜任工作，公司有权直接解除劳动合同。」",
+          "analysis": "条款以“排名末位”直接等同“不胜任工作”，并赋予公司“直接解除”权，缺乏事实认定与程序保障，构成“末位淘汰”陷阱，违反《劳动合同法》第四十条规定。",
+          "parse_success": true,
+          "latency": 7.861
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "末位淘汰陷阱"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      },
+      {
+        "id": "LEASE_012_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「甲方不对租赁房屋的权属状况及是否存在权利负担（包括但不限于查封、抵押等）作出任何保证」",
+          "analysis": "条款明确排除甲方对房屋权属瑕疵及查封抵押的保证义务，属于典型“未披露重大权利瑕疵”情形，违反《民法典》第703条关于出租人应保证房屋适租性的规定，可能导致合同无效或承租人权益严重受损。",
+          "parse_success": true,
+          "latency": 8.963
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "房屋查封抵押未披露"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_040_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「放弃向劳动争议仲裁委员会申请仲裁的权利」",
+          "analysis": "条款明确约定放弃仲裁权利，违反《劳动争议调解仲裁法》第21条“劳动争议仲裁前置”原则，劳动者无法通过法定程序维权，构成对基本权利的剥夺。",
+          "parse_success": true,
+          "latency": 8.173
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "限制争议解决权利"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      }
+    ]
+  },
+  "mode_4": {
+    "mode": 4,
+    "mode_name": "优化工作流",
+    "metrics": {
+      "total": 10,
+      "accuracy": 0.6,
+      "precision": 0.6,
+      "recall": 1.0,
+      "f1": 0.75,
+      "parse_rate": 1.0,
+      "hallucination_rate": 0.0,
+      "risk_id_accuracy": 1.0,
+      "avg_latency_sec": 8.007,
+      "reason_quality": 0.5
+    },
+    "results": [
+      {
+        "id": "SALES_021_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「货物应采用坚固、防潮、防锈、防震的包装，适应长途运输和多次搬运，确保货物安全无损运抵目的地。」",
+          "analysis": "条款未明确具体包装材料或标准（如木箱、泡沫、内衬等），无法判断是否满足“坚固、防潮”等要求，易引发运输损坏后责任归属争议。",
+          "parse_success": true,
+          "latency": 8.696
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "LEASE_023_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「甲方有权随时单方变更收款账户或要求乙方改为现金支付，乙方应无条件配合，否则视为逾期付款」",
+          "analysis": "甲方单方变更收款账户或强制现金支付，违反支付方式应经双方约定的合同原则，乙方无条件配合构成不合理义务，易引发支付错误与纠纷。",
+          "parse_success": true,
+          "latency": 8.74
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "租金支付方式变更"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_031_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「甲方支付给乙方的月工资不低于甲方所在地的最低工资标准」",
+          "analysis": "条款虽提及“不低于最低工资标准”，但未明确“最低工资标准”由谁核定、如何获取、是否动态更新，存在实际执行中被规避或误用风险，且未排除以福利抵扣情形。",
+          "parse_success": true,
+          "latency": 8.449
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "LEASE_001_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「如房屋有人为损坏，双方协商确定维修费用后从押金中扣除」",
+          "analysis": "条款将房屋人为损坏的维修责任完全归于乙方，违反公平原则，且未明确主体结构及设备自然损耗的维修义务归属，构成对租客的不合理责任转嫁。",
+          "parse_success": true,
+          "latency": 7.775
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_008_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「乙方若不能胜任工作，甲方将对乙方进行培训或调整工作岗位。若经培训或调岗后仍不能胜任工作的，甲方可以解除劳动合同」",
+          "analysis": "条款未明确“不能胜任工作”的认定标准，且将“调岗后仍不能胜任”直接作为解除依据，易被认定为“末位淘汰”变相解除，违反《劳动合同法》第40条关于“不能胜任工作”必须有客观证据和程序保障的要求。",
+          "parse_success": true,
+          "latency": 8.388
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "SALES_020_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「买方应在合同签订后3日内，向卖方支付合同总价款的100%作为预付款」",
+          "analysis": "买方需在签约后3日内支付全款，预付比例达100%，远超合理范围，存在卖方违约、破产或“跑路”风险，买方资金安全无保障。",
+          "parse_success": true,
+          "latency": 7.974
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "预付款比例过高"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      },
+      {
+        "id": "LEASE_020_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「乙方需自行解决居住所需的设施设备」",
+          "analysis": "条款将房屋内设施设备的配置与维修责任完全归于乙方，违反公平原则，实质转嫁了房屋自然损耗的维修义务，超出合理范围。",
+          "parse_success": true,
+          "latency": 7.624
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "配套设施不交付"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_008_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「处于考核排名末位（最后5%）的员工，将被视为不胜任工作，公司有权直接解除劳动合同。」",
+          "analysis": "将末位排名直接等同于“不胜任工作”，缺乏事实认定与程序保障，违反《劳动合同法》第40条关于“不胜任工作”需经培训或调岗后仍不胜任的法定要件。",
+          "parse_success": true,
+          "latency": 7.322
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "末位淘汰陷阱"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      },
+      {
+        "id": "LEASE_012_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「甲方不对租赁房屋的权属状况及是否存在权利负担（包括但不限于查封、抵押等）作出任何保证。」",
+          "analysis": "条款明确免除甲方对房屋权属瑕疵的告知义务，违反《民法典》第703条关于出租人应保证房屋适租性的强制性规定，导致乙方面临房屋被查封、无法居住的实质风险。",
+          "parse_success": true,
+          "latency": 8.198
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "房屋查封抵押未披露"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_040_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「放弃向劳动争议仲裁委员会申请仲裁的权利」",
+          "analysis": "该条款单方排除劳动者申请劳动仲裁的权利，违反《劳动争议调解仲裁法》规定的“仲裁前置”原则，且约定管辖地仅限甲方所在地，超出法定管辖范围，明显加重劳动者维权成本。",
+          "parse_success": true,
+          "latency": 6.901
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "限制争议解决权利"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      }
+    ]
+  }
+}

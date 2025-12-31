@@ -1,0 +1,8 @@
+{"id": "golden_001", "text": "甲方有权根据自身经营状况，单方决定是否继续履行本合同，乙方不得异议。", "ground_truth": {"risk_level": "高", "dimension_id": "1", "reason_keywords": ["单方决定", "解除合同", "不得异议"]}}
+{"id": "golden_002", "text": "运输过程中发生的一切货物毁损、灭失风险，无论何种原因，均由乙方承担。", "ground_truth": {"risk_level": "高", "dimension_id": "7", "reason_keywords": ["风险承担", "无论何种原因", "全部责任"]}}
+{"id": "golden_003", "text": "尾款将在甲方收到最终用户付款后，视甲方资金宽裕程度支付。", "ground_truth": {"risk_level": "高", "dimension_id": "3", "reason_keywords": ["视情况", "资金宽裕", "不确定"]}}
+{"id": "golden_004", "text": "若乙方员工在项目期间怀孕，甲方有权立即解除服务合同且不承担违约责任。", "ground_truth": {"risk_level": "高", "dimension_id": "8", "reason_keywords": ["怀孕", "解除合同", "违法"]}}
+{"id": "golden_005", "text": "凡因本合同引起的争议，均由甲方董事长最终裁决，该裁决为终局裁决。", "ground_truth": {"risk_level": "高", "dimension_id": "5", "reason_keywords": ["甲方裁决", "排除管辖", "无效"]}}
+{"id": "golden_006", "text": "若乙方延期交付成果，应向甲方支付违约金，具体金额由甲方根据延期情况酌情确定。", "ground_truth": {"risk_level": "中", "dimension_id": "4", "reason_keywords": ["违约金", "酌情确定", "不明确"]}}
+{"id": "golden_007", "text": "乙方应对甲方的所有信息保密，如有泄露需承担责任。", "ground_truth": {"risk_level": "中", "dimension_id": "6", "reason_keywords": ["所有信息", "范围过宽", "不明确"]}}
+{"id": "golden_008", "text": "本合同一式两份，双方签字盖章后生效，具有同等法律效力。", "ground_truth": {"risk_level": "低", "dimension_id": "8", "reason_keywords": ["生效", "清晰"]}}

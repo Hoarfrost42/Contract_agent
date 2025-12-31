@@ -1,0 +1,204 @@
+{
+  "mode_1": {
+    "mode": 1,
+    "mode_name": "纯LLM (Raw)",
+    "metrics": {
+      "total": 5,
+      "accuracy": 0.4,
+      "precision": 0.4,
+      "recall": 1.0,
+      "f1": 0.5714,
+      "parse_rate": 1.0,
+      "hallucination_rate": 0.0,
+      "risk_id_accuracy": 1.0,
+      "avg_latency_sec": 14.44,
+      "reason_quality": 0.4
+    },
+    "results": [
+      {
+        "id": "LABOR_004_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "在竞业限制期限内，甲方按月向乙方支付乙方离职前十二个月平均工资的30%作为经济补偿。",
+          "analysis": "根据《中华人民共和国劳动合同法》第二十三条和第二十四条规定，用人单位与劳动者约定竞业限制的，应当在解除或者终止劳动合同后按月支付经济补偿。该补偿标准不得低于劳动者离职前十二个月平均工资的30%。但实践中，司法解释和劳动仲裁实践普遍认为，竞业限制补偿应不低于劳动者离职前十二个月平均工资的50%或更高，以确保劳动者在限制期间维持基本生活和职业发展能力。若仅支付30%，可能被认定为明显低于合理标准，导致条款无效或劳动者主张违约责任。此外，若劳动者实际收入显著低于市场水平，该比例更可能被认定为不合理，从而引发争议甚至被法院撤销。",
+          "parse_success": true,
+          "latency": 15.078
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "LEASE_015_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "该房屋仅限于个人居住使用，严禁乙方在房屋内从事任何商业经营活动、办公或注册公司。一经发现，甲方有权直接解除合同并扣除全部押金。",
+          "analysis": "该条款明确限制房屋用途为“个人居住”，并禁止乙方从事任何商业经营活动、办公或注册公司。此类限制属于对房屋使用性质的实质性干预。根据《民法典》第703条，租赁合同应当明确约定租赁用途，但不得违反法律、行政法规的强制性规定，也不得过度限制承租人合理使用租赁物的权利。若房屋本身具备可作为商业用途的物理条件（如空间、结构、位置等），承租人基于合理需求（如居家办公、小型工作室、家庭成员经营等）使用房屋，应被允许。此外，该条款赋予甲方“一经发现”即“直接解除合同并扣除全部押金”的权利，缺乏明确的“发现”标准和程序，易引发争议，且可能构成对承租人基本使用权利的剥夺，违反公平原则和合同自由原则。",
+          "parse_success": true,
+          "latency": 18.526
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "房屋用途限制过严"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      },
+      {
+        "id": "SALES_020_boundary_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "对于定制化设备，买方需在投产前支付50%进度款，发货前支付40%，剩余10%货到验收后支付。",
+          "analysis": "该条款将大额付款（合计90%）与“投产”“发货”“验收”等阶段性节点挂钩，但“投产前”“货到验收后”等节点缺乏明确标准和可操作性，易导致买方在设备未实际投入使用或验收结果存疑时仍需支付款项。同时，定制化设备通常需较长周期，若设备存在质量问题或未达合同约定性能，买方可能面临“已付款但设备无法使用”的风险。此外，验收标准未明确，可能导致验收结果被单方操控，买方权益受损。",
+          "parse_success": true,
+          "latency": 12.076
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_032_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "乙方应当配合甲方办理工作交接。",
+          "analysis": "该条款中“乙方应当配合甲方办理工作交接”将工作交接的配合义务单方面赋予乙方，而未明确乙方在交接过程中的具体权利或甲方在交接中应履行的义务。在实际操作中，工作交接属于劳动关系终止前的必要程序，若乙方因个人原因或信息不全无法配合，可能导致甲方无法顺利完成交接，进而影响乙方权益（如离职后档案、社保接续等）。同时，该条款未明确“配合”的具体内容、方式、时间要求，易引发争议。此外，档案与社保转移是国家强制性规定，甲方负有法定责任，但条款中“应当配合”未体现对甲方义务的明确，存在责任倒置风险。",
+          "parse_success": true,
+          "latency": 11.252
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_007_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "乙方的月工资为打包薪资，已包含正常工作时间工资及所有延时、周末及法定节假日加班费，甲方不再另行支付加班工资。",
+          "analysis": "根据《中华人民共和国劳动法》第三十六条、第三十九条及《中华人民共和国劳动合同法》第三十一条，用人单位应当依法支付劳动者加班工资，且加班工资的计算标准由法律明确，不得通过“打包薪资”方式规避法定支付义务。综合计算工时制下，劳动者在法定节假日或休息日工作的，仍应依法支付加班费，且不得以“打包薪资”形式将加班费全部包含在基本工资中，否则可能构成变相降低劳动者实际收入，违反最低工资保障原则。若实际工作时间超过法定标准，且存在加班情形，该条款可能被认定为无效或存在欺诈风险，劳动者可主张差额赔偿或劳动仲裁维权。",
+          "parse_success": true,
+          "latency": 15.267
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "加班费剥削"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      }
+    ]
+  },
+  "mode_2": {
+    "mode": 2,
+    "mode_name": "基础Prompt",
+    "metrics": {
+      "total": 5,
+      "accuracy": 0.2,
+      "precision": 0.2,
+      "recall": 1.0,
+      "f1": 0.3333,
+      "parse_rate": 1.0,
+      "hallucination_rate": 0.0,
+      "risk_id_accuracy": 1.0,
+      "avg_latency_sec": 7.089,
+      "reason_quality": 0.2
+    },
+    "results": [
+      {
+        "id": "LABOR_027_boundary_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「乙方的工资标准及结构详见甲方发出的《录用通知书》。甲方有权根据每年的薪酬调研结果对薪酬结构进行优化调整。」",
+          "analysis": "录用通知书作为要约，其内容应具约束力，但条款赋予甲方单方调整权，未明确调整范围、程序及乙方异议救济机制，易导致实际执行中权利严重失衡。",
+          "parse_success": true,
+          "latency": 7.009
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "SALES_023_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「国家规定的“三包”政策不适用于本批次商品」",
+          "analysis": "明确排除“三包”责任，违反《消费者权益保护法》第24条，消费者享有法定“三包”权利，不得以清仓为由免除。",
+          "parse_success": true,
+          "latency": 6.096
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "三包责任规避"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      },
+      {
+        "id": "SALES_011_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「包括合同履行后可以获得的利益，但不得超过违约方订立合同时预见到的因违约可能造成的损失。」",
+          "analysis": "该条款虽设定上限，但“合同履行后可以获得的利益”属于可预见性范围外的间接损失，易被滥用，且“预见到”标准模糊，可能导致守约方主张远超合理范围的赔偿，实质上削弱了违约责任的可预测性与公平性。",
+          "parse_success": true,
+          "latency": 7.95
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_023_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「乙方同意与劳务派遣公司建立劳动关系，并被派遣至甲方从事门卫工作」",
+          "analysis": "条款将“临时性、辅助性岗位”与“劳务派遣”直接挂钩，未明确乙方实际为劳动者，易引发劳动关系主体错位，违反《劳动合同法》对劳动关系本质的认定，存在用工合规风险。",
+          "parse_success": true,
+          "latency": 7.174
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "LEASE_008_boundary_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「乙方若能找到合适的转租人接手本合同，经甲方审核通过后，可免除提前退租的违约责任。」",
+          "analysis": "条款中“合适的转租人”“甲方审核通过”标准模糊，缺乏明确判断依据，易引发争议，乙方实际履约困难，甲方可能滥用审核权，导致违约责任免除缺乏可操作性。",
+          "parse_success": true,
+          "latency": 7.218
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      }
+    ]
+  }
+}

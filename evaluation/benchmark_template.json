@@ -1,0 +1,70 @@
+{
+    "_comment": "Benchmark 测试用例模板 - 用于外部 LLM 批量生成",
+    "_format_version": "1.0",
+    "_instructions": {
+        "contract_text": "合同条款原文，建议 50-200 字",
+        "expected_risks": "预期识别出的风险列表，正例至少1个，负例为空数组",
+        "risk_id": "规则库中的风险ID，格式如 GENERAL_001, LABOR_001, LEASE_001, SALES_001",
+        "risk_name": "风险名称，需与规则库一致",
+        "risk_type": "legal (法律风险) 或 commercial (商业风险)",
+        "contract_type": "合同类型：通用条款、劳动合同、租赁合同、买卖合同等",
+        "case_type": "positive (正例-有风险), negative (负例-无风险), boundary (边界用例)"
+    },
+    "test_cases": [
+        {
+            "id": "EXAMPLE_POS_001",
+            "contract_text": "本合同的最终解释权归甲方所有，乙方对条款的理解应以甲方解释为准。如双方对合同内容产生争议，以甲方的解释为最终裁定。",
+            "expected_risks": [
+                {
+                    "risk_id": "GENERAL_002",
+                    "risk_name": "单方解释权",
+                    "risk_type": "legal",
+                    "contract_type": "通用条款",
+                    "laws": "《民法典》第四百九十八条"
+                }
+            ],
+            "case_type": "positive"
+        },
+        {
+            "id": "EXAMPLE_POS_002",
+            "contract_text": "乙方试用期为6个月，试用期工资为转正后工资的60%。试用期内，甲方可随时无理由解除劳动合同，无需支付任何经济补偿。",
+            "expected_risks": [
+                {
+                    "risk_id": "LABOR_001",
+                    "risk_name": "试用期违法约定",
+                    "risk_type": "legal",
+                    "contract_type": "劳动合同",
+                    "laws": "《劳动合同法》第十九条"
+                },
+                {
+                    "risk_id": "LABOR_002",
+                    "risk_name": "试用期薪资过低",
+                    "risk_type": "legal",
+                    "contract_type": "劳动合同",
+                    "laws": "《劳动合同法》第二十条"
+                },
+                {
+                    "risk_id": "LABOR_060",
+                    "risk_name": "试用期随意解除",
+                    "risk_type": "legal",
+                    "contract_type": "劳动合同",
+                    "laws": "《劳动合同法》第二十一条、第三十九条"
+                }
+            ],
+            "case_type": "positive"
+        },
+        {
+            "id": "EXAMPLE_NEG_001",
+            "contract_text": "本合同自双方签字盖章之日起生效，有效期为一年。合同期满后，如双方同意续签，应另行签订书面合同。",
+            "expected_risks": [],
+            "case_type": "negative"
+        },
+        {
+            "id": "EXAMPLE_BOUNDARY_001",
+            "contract_text": "如遇政策调整或市场重大变化，甲方有权对服务内容进行合理调整，并提前15日通知乙方。",
+            "expected_risks": [],
+            "case_type": "boundary",
+            "notes": "边界用例：提及了变更权但有通知义务，需人工判断是否构成风险"
+        }
+    ]
+}

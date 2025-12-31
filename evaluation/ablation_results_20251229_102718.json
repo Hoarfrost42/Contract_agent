@@ -1,0 +1,362 @@
+{
+  "mode_1": {
+    "mode": 1,
+    "mode_name": "纯LLM (Raw)",
+    "metrics": {
+      "total": 10,
+      "accuracy": 0.1,
+      "precision": 0.1,
+      "recall": 1.0,
+      "f1": 0.1818,
+      "parse_rate": 0.0,
+      "hallucination_rate": 0.1,
+      "risk_id_accuracy": 1.0,
+      "avg_latency_sec": 12.197,
+      "reason_quality": 0.1
+    },
+    "results": [
+      {
+        "id": "SALES_021_boundary_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "“卖方应按照其通用的出口标准对货物进行包装。若买方对包装有特殊要求，应在发货前书面通知卖方，产生的额外费用由买方承担。”",
+          "analysis": "条款中“通用的出口标准”表述模糊，缺乏具体定义，易导致双方对“标准”理解不一致，可能引发争议。若买方未明确提出特殊要求，但实际货物因包装不符合运输或安全要求导致损失，卖方可能以“通用标准”为由免责。此外，条款将“特殊要求”产生的额外费用全部归责于买方，存在明显单方风险转移，违背公平原则，尤其在买方为最终消费者或对包装有合理需求时，可能构成不合理加重义务。该条款实质上将包装责任与费用风险完全转移给买方，缺乏对卖方合理履行义务的保障，易引发履约争议和索赔。",
+          "parse_success": false,
+          "latency": 13.863
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": false
+      },
+      {
+        "id": "GENERAL_004_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "本合同履行期间，如遇国家政策调整或市场环境重大变化，确需变更合同条款的，甲乙双方应通过书面形式协商一致，并签署补充协议后方可生效。",
+          "analysis": "该条款将合同变更的决定权完全交由甲乙双方“协商一致”，在实际操作中可能导致一方（尤其是弱势方）在政策或市场突变时难以有效表达诉求或获得合理回应。例如，若政策调整导致一方履约成本大幅上升，而另一方拒绝协商或拖延签署补充协议，将直接导致合同履行障碍，甚至引发违约纠纷。此外，“确需变更”标准模糊，缺乏明确判断依据，易引发争议。该条款未设定变更的触发机制或决策流程，也未明确违约责任，可能使合同处于“僵化”状态，不利于应对突发风险。",
+          "parse_success": false,
+          "latency": 9.987
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_022_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "乙方休病假期间，甲方应当按照公司所在地关于病假工资支付的规定支付病假工资。病假工资不低于当地最低工资标准的80%。",
+          "analysis": "根据中国《劳动合同法》及相关劳动保障法规，用人单位在员工休病假期间，应依法支付病假工资，且该工资不得低于当地最低工资标准的80%。然而，部分地方性法规（如《江苏省工资支付条例》《广东省工资支付条例》等）明确指出，病假工资的最低标准不得低于当地最低工资标准的80%，但该标准本身是“最低”保障，即用人单位不得低于此标准。若合同约定“不低于80%”则看似合规，但若实际执行中存在“低于80%”或“未明确以最低工资标准为基准”的情形，可能被认定为违反最低工资保障义务。此外，若地方规定明确要求病假工资不得低于最低工资标准的80%，而合同未明确“以当地最低工资标准为基准”，则存在执行模糊、被认定为不合规的风险。同时，若员工病假期间用人单位未依法支付病假工资，可能构成拖欠工资，违反《劳动法》第50条，进而引发劳动仲裁或诉讼。",
+          "parse_success": false,
+          "latency": 13.611
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_020_boundary_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "乙方提前解除劳动合同的，除返还剩余服务期分摊的培训费外，还应赔偿因其离职给甲方造成的招聘重置成本及项目延期损失。",
+          "analysis": "该条款设定的赔偿范围包括“招聘重置成本”和“项目延期损失”，属于对用人单位经营损失的直接量化赔偿。然而，根据《中华人民共和国劳动合同法》及相关司法解释，劳动者提前解除劳动合同，仅需承担合理范围内的培训费用返还义务，用人单位不得要求劳动者赔偿因招聘、项目延期等间接经济损失。此类损失通常难以举证、数额不确定，且属于用人单位经营风险，不应由劳动者承担。该条款实质上将用人单位的经营风险转嫁给劳动者，明显超出法律允许的合理范围，违反公平原则和诚实信用原则，存在显著法律风险和可执行性问题。",
+          "parse_success": false,
+          "latency": 13.014
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "SALES_024_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "收货人：张三，联系电话：138xxxxxxx。卖方负责将货物运送至上述地址并承担运费。",
+          "analysis": "合同中指定的收货人为“张三”，但未提供其身份证明、授权文件或实际经营主体信息，存在收货人身份真实性无法核实的风险。同时，联系电话为“138xxxxxxx”属于模糊化处理，无法确保联系畅通，可能导致卖方无法及时与收货人沟通，延误交货或引发争议。此外，卖方“承担运费”但未明确运费支付方式、结算周期或违约责任，若货物无法交付或收货人拒收，卖方可能面临无法追偿或无法履行义务的风险。该条款未约定交货验收、签收确认、逾期责任等关键履约环节，易导致实际履行中产生争议。",
+          "parse_success": false,
+          "latency": 11.618
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "SALES_010_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "买方有权从合同总价款中扣留20%作为质量保证金。该保证金由买方无息持有，直至设备报废或买方认为无需继续保留时方予退还。",
+          "analysis": "该条款赋予买方在未明确违约情形下单方面扣留20%合同款项的权利，且无息持有直至设备报废或买方主观判断“无需保留”时才退还，缺乏明确的触发条件和退还机制。这可能导致买方滥用权利，长期不退还保证金，甚至在设备正常运行期间无正当理由拖延退还，构成对买方实质履约利益的剥夺。同时，“设备报废”标准模糊，“买方认为无需保留”属于主观判断，缺乏可操作性，易引发争议。此外，无息持有可能违反《民法典》关于合理利息和公平原则的规定，且未设定明确的质保期或质量缺陷认定流程，导致质量责任归属不清，增加买方履约风险。",
+          "parse_success": false,
+          "latency": 12.039
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "质保金过高或无限期"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      },
+      {
+        "id": "LEASE_021_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "甲方承诺房屋符合国家规定的建筑、消防、治安、卫生等安全条件，不得将原始设计为居住空间的房间分割出租，不得违规安排多人居住。",
+          "analysis": "该条款虽旨在保障居住安全，但“符合国家规定”属于抽象标准，缺乏具体可操作的认定依据，实际执行中难以判断是否达标，易引发争议。同时，“原始设计为居住空间的房间”“违规安排多人居住”等表述模糊，未明确“原始设计”如何界定、是否包含改建情况，也未说明“多人居住”的人数上限或具体情形，可能导致实际租赁中出现违规使用，且甲方无法举证其已履行安全义务。此外，若房屋本身存在结构性缺陷或消防隐患，甲方可能因无法证明其已尽合理审查义务而承担法律责任。该条款将全部安全责任归于甲方，但未体现乙方作为实际使用者的合理注意义务，也未设定违约责任或第三方责任追偿机制，存在明显责任不对等风险。",
+          "parse_success": false,
+          "latency": 13.063
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "SALES_008_boundary_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "货物所有权自双方签署验收合格单之日起转移给买方。在此之前，货物由卖方负责保管，风险由卖方承担。",
+          "analysis": "该条款将“所有权”与“风险”分别设定转移时点，但未明确“验收合格单”是否为实际交付或质量符合约定的实质性证明。若货物在交付前发生毁损或灭失，买方虽已取得所有权，但实际尚未取得控制权或未完成验收，此时若风险仍由卖方承担，可能引发争议。根据《民法典》相关规定，风险转移以交付为原则，若未明确交付或验收，买方难以主张所有权，导致实际权利与责任错位。此外，若验收合格单签署存在瑕疵（如未实际验收、虚假签署），则可能被认定为无效或可撤销，从而削弱条款效力。因此，该条款存在“所有权转移”与“风险承担”脱节的风险，易引发买方主张权利但无法实际控制货物，或卖方承担损失却未实际交付的情形。",
+          "parse_success": false,
+          "latency": 12.968
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "LEASE_023_boundary_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "如甲方原收款账户因银行原因冻结或注销，甲方可以通过微信或短信方式通知乙方将当期租金支付至新的临时账户。",
+          "analysis": "该条款赋予甲方单方面变更收款账户的权利，但未明确乙方是否需事先知晓、是否需确认新账户有效性，也未规定通知方式的可追溯性或送达证明。微信或短信属于非正式、易被否认的通信方式，存在乙方无法有效接收或证明已收到通知的风险。若账户变更未经乙方书面确认，可能导致乙方误将租金支付至错误账户，进而引发租金未到账、违约责任归属不明等问题。此外，“临时账户”缺乏定义，可能涉及资金安全、监管合规等问题，且未约定账户变更后的责任承担机制，易引发争议。",
+          "parse_success": false,
+          "latency": 10.394
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "SALES_010_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "若在12个月的质保期内无质量问题，买方应在质保期届满后7个工作日内将质保金全额无息退还给卖方。",
+          "analysis": "该条款将“无质量问题”作为退还质保金的前提，但未明确“质量问题”的认定标准、举证责任归属及争议解决机制。若发生争议，买方可能以“未发现质量问题”为由拒绝退还，或以“存在隐蔽缺陷”为由主张质保金不退，而卖方则可能因缺乏明确标准而难以主张权利。此外，7个工作日的退还期限过短，且未约定逾期违约责任，一旦买方拖延退还，卖方将面临资金占用和维权成本上升的风险。该条款实质上将质保金的退还责任完全交由买方单方决定，缺乏对卖方权利的保障，构成实质性的不对等。",
+          "parse_success": false,
+          "latency": 11.414
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      }
+    ]
+  },
+  "mode_2": {
+    "mode": 2,
+    "mode_name": "基础Prompt",
+    "metrics": {
+      "total": 10,
+      "accuracy": 0.1,
+      "precision": 0.1,
+      "recall": 1.0,
+      "f1": 0.1818,
+      "parse_rate": 0.0,
+      "hallucination_rate": 0.0,
+      "risk_id_accuracy": 1.0,
+      "avg_latency_sec": 6.059,
+      "reason_quality": 0.1
+    },
+    "results": [
+      {
+        "id": "SALES_021_boundary_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「卖方应按照其通用的出口标准对货物进行包装」",
+          "analysis": "条款未定义“通用出口标准”，易引发争议；买方特殊要求未明确纳入义务，可能被排除在合同外，导致履约纠纷。",
+          "parse_success": false,
+          "latency": 5.867
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "GENERAL_004_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「如遇国家政策调整或市场环境重大变化，确需变更合同条款的」",
+          "analysis": "条款中“国家政策调整”“市场环境重大变化”缺乏明确标准，易导致双方对是否构成变更产生分歧，实际执行中易引发争议。",
+          "parse_success": false,
+          "latency": 5.517
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_022_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「病假工资不低于当地最低工资标准的80%」",
+          "analysis": "该条款未明确“公司所在地”具体执行标准，且未说明是否符合《最低工资规定》中“不得低于最低工资标准”的强制性要求，存在违反最低工资保障义务的风险。",
+          "parse_success": false,
+          "latency": 5.92
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_020_boundary_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「赔偿因其离职给甲方造成的招聘重置成本及项目延期损失」",
+          "analysis": "该条款设定的赔偿范围缺乏明确标准，且“招聘重置成本”“项目延期损失”难以量化，易被认定为不合理加重乙方责任，违反《民法典》第584条关于损失赔偿的合理性要求。",
+          "parse_success": false,
+          "latency": 6.142
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "SALES_024_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「收货人：张三，联系电话：138xxxxxxx。」",
+          "analysis": "收货人姓名与联系方式模糊，缺乏身份验证机制，易导致货物误收或无法联系，且未明确张三是否为法定接收人或授权代表，存在履约风险。",
+          "parse_success": false,
+          "latency": 5.988
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "SALES_010_pos_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「直至设备报废或买方认为无需继续保留时方予退还」",
+          "analysis": "条款未规定明确退还期限，买方可无限期延迟退还，构成对买方实质控制权的滥用，违反公平原则。",
+          "parse_success": false,
+          "latency": 5.609
+        },
+        "ground_truth": {
+          "risk_level": "高",
+          "reason_keywords": [
+            "质保金过高或无限期"
+          ]
+        },
+        "correct_risk": true,
+        "evidence_valid": true
+      },
+      {
+        "id": "LEASE_021_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「甲方承诺房屋符合国家规定的建筑、消防、治安、卫生等安全条件，不得将原始设计为居住空间的房间分割出租，不得违规安排多人居住。」",
+          "analysis": "该条款将安全条件与具体行为限制全部归于甲方，但未明确标准、未设定验收机制，且“符合”“不得”等表述缺乏可操作性，易导致实际执行中无法判断是否违规，存在重大履约风险。",
+          "parse_success": false,
+          "latency": 6.927
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "SALES_008_boundary_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「货物所有权自双方签署验收合格单之日起转移给买方。在此之前，货物由卖方负责保管，风险由卖方承担。」",
+          "analysis": "条款将所有权转移与风险承担分别设定，但未明确验收合格单是否构成实际交付或质量确认，可能导致买方在未实际接收货物时即被认定为“已取得所有权”，从而引发争议。",
+          "parse_success": false,
+          "latency": 6.399
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "LEASE_023_boundary_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「甲方可以通过微信或短信方式通知乙方将当期租金支付至新的临时账户」",
+          "analysis": "条款未明确乙方是否需确认通知、未约定通知有效性标准，也未设定违约责任，易导致乙方误付或拒付，增加交易不确定性。",
+          "parse_success": false,
+          "latency": 5.834
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "SALES_010_neg_1",
+        "prediction": {
+          "risk_level": "高",
+          "evidence": "「若在12个月的质保期内无质量问题，买方应在质保期届满后7个工作日内将质保金全额无息退还给卖方。」",
+          "analysis": "条款未明确“无质量问题”的认定标准和争议解决机制，买方可能以主观判断或事后主张为由拒绝退款，导致卖方维权无据。",
+          "parse_success": false,
+          "latency": 6.387
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,198 @@
+{
+  "mode_1": {
+    "mode": 1,
+    "mode_name": "纯LLM (Raw)",
+    "metrics": {
+      "total": 5,
+      "accuracy": 0.0,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "parse_rate": 0.0,
+      "hallucination_rate": 0.0,
+      "risk_id_accuracy": 0,
+      "avg_latency_sec": 0.523,
+      "reason_quality": 0.0
+    },
+    "results": [
+      {
+        "id": "LEASE_022_boundary_1",
+        "prediction": {
+          "risk_level": "未知",
+          "evidence": "",
+          "analysis": "",
+          "parse_success": false,
+          "latency": 0.505
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_028_boundary_1",
+        "prediction": {
+          "risk_level": "未知",
+          "evidence": "",
+          "analysis": "",
+          "parse_success": false,
+          "latency": 0.571
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_030_neg_1",
+        "prediction": {
+          "risk_level": "未知",
+          "evidence": "",
+          "analysis": "",
+          "parse_success": false,
+          "latency": 0.478
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "SALES_021_boundary_1",
+        "prediction": {
+          "risk_level": "未知",
+          "evidence": "",
+          "analysis": "",
+          "parse_success": false,
+          "latency": 0.501
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "SALES_024_neg_1",
+        "prediction": {
+          "risk_level": "未知",
+          "evidence": "",
+          "analysis": "",
+          "parse_success": false,
+          "latency": 0.559
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      }
+    ]
+  },
+  "mode_2": {
+    "mode": 2,
+    "mode_name": "基础Prompt",
+    "metrics": {
+      "total": 5,
+      "accuracy": 0.0,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "parse_rate": 0.0,
+      "hallucination_rate": 0.0,
+      "risk_id_accuracy": 0,
+      "avg_latency_sec": 0.473,
+      "reason_quality": 0.0
+    },
+    "results": [
+      {
+        "id": "LEASE_018_neg_1",
+        "prediction": {
+          "risk_level": "未知",
+          "evidence": "",
+          "analysis": "",
+          "parse_success": false,
+          "latency": 0.478
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_026_boundary_1",
+        "prediction": {
+          "risk_level": "未知",
+          "evidence": "",
+          "analysis": "",
+          "parse_success": false,
+          "latency": 0.469
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "SALES_032_boundary_1",
+        "prediction": {
+          "risk_level": "未知",
+          "evidence": "",
+          "analysis": "",
+          "parse_success": false,
+          "latency": 0.468
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "LABOR_031_boundary_1",
+        "prediction": {
+          "risk_level": "未知",
+          "evidence": "",
+          "analysis": "",
+          "parse_success": false,
+          "latency": 0.492
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      },
+      {
+        "id": "SALES_022_neg_1",
+        "prediction": {
+          "risk_level": "未知",
+          "evidence": "",
+          "analysis": "",
+          "parse_success": false,
+          "latency": 0.459
+        },
+        "ground_truth": {
+          "risk_level": "低",
+          "reason_keywords": []
+        },
+        "correct_risk": false,
+        "evidence_valid": true
+      }
+    ]
+  }
+}
