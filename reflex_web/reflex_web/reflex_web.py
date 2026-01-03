@@ -60,7 +60,7 @@ def index() -> rx.Component:
                     line_height="1.2",
                 ),
                 rx.text(
-                    "AI 驱动的合同合规性深度审查与风险识别系统",
+                    "大语言模型驱动的合同合规性深度审查与风险识别系统",
                     font_size="1.1rem",
                     font_weight="400",
                     color=COLORS["body"],

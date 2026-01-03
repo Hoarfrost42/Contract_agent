@@ -30,7 +30,7 @@ def sidebar() -> rx.Component:
                     justify_content="center",
                 ),
                 rx.text(
-                    "Contract AI", 
+                    "合同风险监测", 
                     font_weight="700", 
                     font_size="1.1rem", 
                     color=COLORS["heading"],

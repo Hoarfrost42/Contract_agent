@@ -71,7 +71,7 @@ class RuleEngine:
                 return True, match.group(0)
         return False, None
 
-    def match_risk(self, clause_text: str) -> Tuple[Optional[Dict], float, str]:
+    def match_risk(self, clause_text: str, contract_type: str = "通用") -> Tuple[Optional[Dict], float, str]:
         """
         基于混合检索匹配条款与风险规则。
         
@@ -81,7 +81,8 @@ class RuleEngine:
         from src.core.preprocessor import preprocess_clause
         
         # 1. Preprocessing (Filtering)
-        allowed_rules = preprocess_clause(clause_text, self.rules)
+        # 传入 contract_type 进行领域过滤
+        allowed_rules = preprocess_clause(clause_text, self.rules, contract_type)
         
         if not allowed_rules:
             # 规则库预处理过滤掉了，尝试关键词兜底
@@ -182,13 +183,13 @@ class RuleEngine:
 
         return "\n".join(results)
 
-    def get_reference_info(self, clause_text: str) -> Tuple[str, Optional[str], Optional[str], float, str]:
+    def get_reference_info(self, clause_text: str, contract_type: str = "通用") -> Tuple[str, Optional[str], Optional[str], float, str]:
         """
         获取条款的格式化参考信息。
         
         返回: (适合注入 LLM Prompt 的字符串, 检索到的法律原文内容, 风险规则ID, 置信度分数, 匹配来源)
         """
-        rule, confidence, match_source = self.match_risk(clause_text)
+        rule, confidence, match_source = self.match_risk(clause_text, contract_type)
         
         # 关键词兜底触发
         if match_source.startswith("keyword_fallback:"):
@@ -231,13 +232,14 @@ class RuleEngine:
             
         return info, law_content, rule.get('risk_id'), confidence, match_source
 
-    def get_reference_info_topk(self, clause_text: str, top_k: int = 3) -> Tuple[str, List[str], List[str], List[float]]:
+    def get_reference_info_topk(self, clause_text: str, top_k: int = 3, contract_type: str = "通用") -> Tuple[str, List[str], List[str], List[float]]:
         """
         获取条款的 Top-K 格式化参考信息（多规则匹配）。
         
         Args:
             clause_text: 条款原文
             top_k: 返回的规则数量
+            contract_type: 合同类型（用于过滤规则）
         
         Returns: 
             (格式化的参考信息字符串, 法条内容列表, 风险ID列表, 置信度列表)
@@ -245,7 +247,8 @@ class RuleEngine:
         from src.core.preprocessor import preprocess_clause
         
         # 1. Preprocessing
-        allowed_rules = preprocess_clause(clause_text, self.rules)
+        # 传入 contract_type 进行领域过滤
+        allowed_rules = preprocess_clause(clause_text, self.rules, contract_type)
         if not allowed_rules:
             return "无匹配的专家规则库信息。", [], [], []
         

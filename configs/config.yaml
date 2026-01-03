@@ -25,3 +25,31 @@ hybrid_search_config:
   alpha: 0.65  # Dense Score 权重 (1-alpha 为 Sparse Score 权重)
   threshold: 0.75  # 相似度阈值，低于此值的匹配将被过滤
   top_k: 3  # Top-K 规则数量：传递给 LLM 的候选规则数量（仅超过阈值的规则）
+
+# Reranker 重排序配置
+reranker_config:
+  enabled: true  # 是否启用 Reranker
+  model_name: "BAAI/bge-reranker-v2-m3"  # Reranker 模型名称
+  threshold: 0.5  # Rerank 分数阈值，低于此分数的结果将被过滤
+  use_fp16: true  # 是否使用 FP16 加速（推荐）
+
+# ============= 消融实验评测配置 =============
+ablation_benchmark_config:
+  # 数据集配置
+  dataset_path: "evaluation/llm_benchmark_dataset.json"  # 评测数据集路径
+  
+  # 证据幻觉检测配置
+  # 注意：threshold 复用 reranker_config.threshold，top_k 复用 hybrid_search_config.top_k
+  hallucination_detection:
+    use_two_stage: true  # 是否使用两阶段检测（BGE-M3 召回 + Reranker 精排）
+  
+  # 评测模式配置
+  eval_modes:
+    raw_llm: 1  # 原始 LLM
+    basic_prompt: 2  # 基础 Prompt
+    current_workflow: 3  # 当前工作流（带 RAG）
+    optimized_workflow: 4  # 优化后工作流
+  
+  # 默认设置
+  default_mode: 3  # 默认评测模式
+  default_source: "local"  # 默认 LLM 来源（local/cloud）

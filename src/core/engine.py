@@ -7,9 +7,9 @@ from typing import List, Dict, Any
 from src.core.llm import LLMClient
 from src.core.types import ClauseAnalysis
 from src.core.rule_engine import RuleEngine
+from src.core.contract_classifier import ContractClassifier
 from src.utils.parser import split_contract
 from src.utils.progress_tracker import ProgressTracker
-
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +41,10 @@ class ContractAnalyzer:
         # 初始化 LLM 客户端
         llm_client = LLMClient(source=llm_source)
         
+        # 0. 合同类型推断
+        contract_type = ContractClassifier.classify(text)
+        self.tracker.add_log(job_id, f"🔍 识别合同类型为: {contract_type} (将根据此类型过滤无关风险规则)")
+        
         # 1. 使用正则切分合同条款
         clauses_text = split_contract(text)
         if not clauses_text:
@@ -61,19 +65,21 @@ class ContractAnalyzer:
         async def process_clause(i: int, clause_text: str):
             """处理单个条款的内部异步函数"""
             async with semaphore:
-                # 2. 规则匹配 (Rule Matching) - Top-K 模式
-                # 从规则库中检索相关的专家知识和法律引用
-                from src.utils.config_loader import load_config
-                config = load_config()
-                top_k = config.get("hybrid_search_config", {}).get("top_k", 3)
+                # 2. 规则匹配 (Rule Matching) - 使用统一检索器
+                from src.core.reference_retriever import retrieve_reference
+                # 传入 contract_type 进行精准检索
+                result = retrieve_reference(clause_text, contract_type=contract_type)
                 
-                reference_info, law_contents, risk_ids, scores = self.rule_engine.get_reference_info_topk(clause_text, top_k=top_k)
+                reference_info = result.reference_info
+                law_contents = result.law_contents
+                risk_ids = result.risk_ids
+                scores = result.scores
                 
                 # 兼容：取第一个匹配结果用于后续处理
                 law_content = law_contents[0] if law_contents else None
                 risk_id = risk_ids[0] if risk_ids else None
                 confidence = scores[0] if scores else 0.0
-                match_source = "rule_match" if risk_ids else "no_match"
+                match_source = result.match_source
                 
                 # ========== 打印规则匹配结果（人工审查）==========
                 clause_preview = clause_text[:60].replace('\n', ' ') + "..." if len(clause_text) > 60 else clause_text.replace('\n', ' ')
@@ -81,7 +87,7 @@ class ContractAnalyzer:
                 print(f"📋 条款 {i+1}: {clause_preview}")
                 
                 if risk_ids:
-                    print(f"   ✅ 匹配到 {len(risk_ids)} 个候选规则 (top_k={top_k})")
+                    print(f"   ✅ 匹配到 {len(risk_ids)} 个候选规则 (reranked={result.reranked})")
                     for j, (rid, score) in enumerate(zip(risk_ids, scores)):
                         rule = next((r for r in self.rule_engine.rules if r.get('risk_id') == rid), None)
                         rule_name = rule.get('risk_name', '未知') if rule else '未知'

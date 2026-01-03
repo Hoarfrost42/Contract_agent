@@ -129,6 +129,7 @@ def generate_word_report(
     
     for idx, item in enumerate(structured_data):
         risk_level = item.get("risk_level", "低")
+        is_high_risk = risk_level == "高"
         
         # 条款标题
         clause_heading = doc.add_heading(f"条款 {idx + 1}", level=2)

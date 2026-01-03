@@ -190,13 +190,14 @@ class RiskFilter:
         return result
 
     @classmethod
-    def filter_rules(cls, clause_text: str, categories: Set[str], rules: List[Dict]) -> List[Dict]:
+    def filter_rules(cls, clause_text: str, categories: Set[str], rules: List[Dict], contract_type: str = "通用") -> List[Dict]:
         """
         过滤逻辑：
-        0. 开场白过滤：opening 类别直接返回空规则
-        1. 结构过滤：信息/定义类条款若动词少，直接忽略。
-        2. 适用性过滤：applicable_to
-        3. 关键词过滤：required_keywords
+        0. 领域过滤：根据合同类型过滤不相关的领域规则
+        1. 开场白过滤：opening 类别直接返回空规则
+        2. 结构过滤：信息/定义类条款若动词少，直接忽略。
+        3. 适用性过滤：applicable_to
+        4. 关键词过滤：required_keywords
         """
         
         # 0. 开场白过滤（合同开头的程序性内容，无风险）
@@ -213,6 +214,36 @@ class RiskFilter:
         allowed_rules = []
         
         for rule in rules:
+            # -1. 领域过滤 (Contract Type Filter)
+            # 规则的 contract_type 字段，例如 "劳动合同", "租赁合同", "买卖合同", "通用", "通用/租赁/买卖"
+            rule_type_str = rule.get("contract_type", "通用")
+            
+            # 如果是通用合同，我们不做严格过滤（或者全部保留？用户需求是“禁用劳动法规则”）
+            # 如果检测到是 "租赁合同"：
+            #   - 保留 "租赁" 相关的规则
+            #   - 保留 "通用" 相关的规则
+            #   - 剔除 "劳动", "买卖" 等其他特定领域
+            
+            if contract_type != "通用":
+                # 检查规则是否适用当前合同类型
+                # 规则适用如果：
+                # 1. 规则包含 "通用"
+                # 2. 规则包含当前类型 (e.g. "租赁" in "租赁合同")
+                
+                is_rule_applicable = False
+                if "通用" in rule_type_str:
+                    is_rule_applicable = True
+                elif contract_type in rule_type_str:
+                    is_rule_applicable = True
+                # 特殊情况处理：比如 "买卖" 和 "采购" 可能互通，但在 Classifier 中已归一化为 "买卖合同"
+                
+                if not is_rule_applicable:
+                    # 如果规则类型是完全不相关的领域，则过滤
+                    # 例如 detected="租赁合同", rule="劳动合同" -> 过滤
+                    # detected="租赁合同", rule="通用/买卖" -> 保留吗？规则包含通用，保留。
+                    # detected="租赁合同", rule="买卖合同" -> 过滤。
+                    continue
+
             # 2. 适用性过滤 (applicable_to)
             applicable_to = rule.get("applicable_to")
             if applicable_to:
@@ -237,13 +268,14 @@ class RiskFilter:
             
         return allowed_rules
 
-def preprocess_clause(clause_text: str, risk_library: List[Dict]) -> List[Dict]:
+def preprocess_clause(clause_text: str, risk_library: List[Dict], contract_type: str = "通用") -> List[Dict]:
     """
     预处理总控函数。
     
     Args:
         clause_text: 条款文本
         risk_library: 完整风险规则库
+        contract_type: 检测到的合同类型
         
     Returns:
         allowed_rules: 允许参与后续检索的风险点列表
@@ -252,7 +284,7 @@ def preprocess_clause(clause_text: str, risk_library: List[Dict]) -> List[Dict]:
     categories = ClauseClassifier.classify(clause_text)
     
     # 2. 过滤
-    allowed_rules = RiskFilter.filter_rules(clause_text, categories, risk_library)
+    allowed_rules = RiskFilter.filter_rules(clause_text, categories, risk_library, contract_type)
     
     return allowed_rules
 

@@ -86,9 +86,7 @@ def render_ablation_study_tab():
     
     # 可用数据集
     available_datasets = [
-        "evaluation/llm_benchmark_dataset.jsonl",
-        "evaluation/golden_dataset.jsonl",
-        "evaluation/generated_test_cases.jsonl",
+        "evaluation/llm_benchmark_dataset.json",
     ]
     
     with col1:
@@ -336,9 +334,7 @@ def render_single_mode_tab():
     
     # 可用数据集
     available_datasets = [
-        "evaluation/llm_benchmark_dataset.jsonl",
-        "evaluation/golden_dataset.jsonl",
-        "evaluation/generated_test_cases.jsonl",
+        "evaluation/llm_benchmark_dataset.json",
     ]
     
     with col1:

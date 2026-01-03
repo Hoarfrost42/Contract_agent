@@ -73,7 +73,7 @@ class AppState(rx.State):
     
     # ==================== Benchmark 状态 ====================
     ablation_modes: List[int] = [1, 2, 3, 4]
-    ablation_data_path: str = "evaluation/llm_benchmark_dataset.jsonl"
+    ablation_data_path: str = "evaluation/llm_benchmark_dataset.json"
     ablation_limit: int = 5
     ablation_source: str = "local"
     ablation_results: Dict[str, Any] = {}
@@ -83,9 +83,7 @@ class AppState(rx.State):
     
     # 可用数据集列表
     available_datasets: List[str] = [
-        "evaluation/llm_benchmark_dataset.jsonl",
-        "evaluation/golden_dataset.jsonl",
-        "evaluation/generated_test_cases.jsonl",
+        "evaluation/llm_benchmark_dataset.json",
     ]
     
     # ==================== 报告页状态 ====================

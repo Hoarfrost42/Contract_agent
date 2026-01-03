@@ -29,34 +29,30 @@ temp_uploads/
 # 数据库缓存
 *.db-journal
 
-# 周报和个人文档
-*_weekly_report.md
-*.docx
+# 文档和报告（已移至 docs/）
+docs/reports/*.docx
 
-# 测试和一次性脚本
-test_*.py
-import_processed_laws.py
-process_law_text.py
+# 评测结果（可选忽略）
+evaluation/results/
 
-# 中间数据文件（根目录）
-GENERAL.json
-LABOR.json
-LEASE.json
-SALES.json
-
-# 评测数据（可选上传）
+# 辅助数据（可选）
 Evaldata/
-
-# 辅助脚本
-scripts/
-
-# 技术评审文档（可选）
-Review.md
-KEY_CODE_IMPLEMENTATION.md
-OPTIMIZATION_GUIDE.md
 
 # macOS
 .DS_Store
 
 # Windows
 Thumbs.db
+
+# new added
+evaluation/results_*/
+check_classifier.py
+reflex_web/.web/
+*.log
+LABOR.json
+SALES.json
+LEASE.json
+GENERAL.json
+evaluation/charts/
+__pycache__/
+*.pyc
