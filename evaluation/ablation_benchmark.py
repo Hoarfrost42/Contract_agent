@@ -40,6 +40,7 @@ from src.core.prompts import (
     BASIC_PROMPT, 
     CURRENT_WORKFLOW_PROMPT,
     OPTIMIZED_WORKFLOW_PROMPT,
+    SELF_REFLECTION_PROMPT,
     get_prompt_by_mode,
 )
 from src.core.reference_retriever import retrieve_reference
@@ -123,6 +124,56 @@ def stratified_sample(dataset: List[dict], limit: int) -> List[dict]:
     return sampled
 
 
+def parse_reflection_output(content: str) -> dict:
+    """解析自反思输出
+    
+    期望格式：
+    审查结论：[维持 / 调级]
+    修正建议：[若调级，请写具体等级流向，如"中风险 -> 低风险"；若维持，填"无"]
+    理由：[基于审查基准简述理由]
+    
+    Returns:
+        dict: {
+            "conclusion": "维持" / "调级",
+            "adjustment": "中风险 -> 低风险" / "无",
+            "new_level": "高" / "中" / "低" / None,
+            "reason": "..."
+        }
+    """
+    result = {
+        "conclusion": "维持",
+        "adjustment": "无",
+        "new_level": None,
+        "reason": ""
+    }
+    
+    # 解析审查结论
+    conclusion_match = re.search(r'审查结论[：:]\s*\[?\s*(维持|调级)\s*\]?', content)
+    if conclusion_match:
+        result["conclusion"] = conclusion_match.group(1)
+    
+    # 解析修正建议
+    adjustment_match = re.search(r'修正建议[：:]\s*\[?\s*(.+?)\s*\]?(?:\n|$)', content)
+    if adjustment_match:
+        adj = adjustment_match.group(1).strip()
+        result["adjustment"] = adj
+        
+        # 提取新的风险等级
+        if "低风险" in adj and "->" in adj:
+            result["new_level"] = "低"
+        elif "中风险" in adj and "->" in adj:
+            result["new_level"] = "中"
+        elif "高风险" in adj and "->" in adj:
+            result["new_level"] = "高"
+    
+    # 解析理由
+    reason_match = re.search(r'理由[：:]\s*\[?\s*(.+?)\s*\]?(?:\n|$)', content, re.DOTALL)
+    if reason_match:
+        result["reason"] = reason_match.group(1).strip()[:100]  # 截断到100字
+    
+    return result
+
+
 # ============================================================================
 # 评估器
 # ============================================================================
@@ -170,6 +221,11 @@ class EvalMetrics:
     
     # ===== 方法三：任务成功率 =====
     task_success_count: int = 0  # 任务完全成功的样本数
+    
+    # ===== 自反思机制统计 =====
+    reflection_calls: int = 0      # 自反思调用次数
+    reflection_adjustments: int = 0  # 反思后调级次数
+    reflection_maintain: int = 0   # 反思后维持原判次数
     
     # 响应时间统计
     total_latency: float = 0.0
@@ -418,6 +474,12 @@ class EvalMetrics:
             # 性能
             "avg_latency_sec": round(self.total_latency / self.total, 3) if self.total > 0 else 0,
             "reason_quality": round(self.correct_reason / self.total, 4) if self.total > 0 else 0,
+            
+            # 自反思机制统计
+            "reflection_calls": self.reflection_calls,
+            "reflection_adjustments": self.reflection_adjustments,
+            "reflection_maintain": self.reflection_maintain,
+            "reflection_adjustment_rate": round(self.reflection_adjustments / self.reflection_calls, 4) if self.reflection_calls > 0 else 0,
         }
 
 
@@ -735,13 +797,15 @@ class AblationBenchmark:
         """分析单个条款
         
         Returns:
-            tuple: (ParsedResult, reference_info, risk_ids, scores)
+            tuple: (ParsedResult, reference_info, risk_ids, scores, reflection_info)
         """
         # 获取参考信息（模式3和4使用 Top-K 检索）
         reference_info, law_contents, risk_ids, scores = self.get_reference_info(clause)
         
         # 构建Prompt
         prompt = self.get_prompt(clause, reference_info)
+        
+        reflection_info = None  # 自反思结果
         
         try:
             # 使用 OllamaClient 的 achat 方法
@@ -754,11 +818,73 @@ class AblationBenchmark:
             if law_contents and result.law_reference == "":
                 result.law_reference = law_contents[0] if law_contents[0] else ""
             
-            return result, reference_info, risk_ids, scores
+            # ========== 自反思机制（仅 Mode 3 和 Mode 4）==========
+            if self.mode in [EvalMode.CURRENT_WORKFLOW, EvalMode.OPTIMIZED_WORKFLOW]:
+                result, reflection_info = await self._apply_self_reflection(clause, result)
+            
+            return result, reference_info, risk_ids, scores, reflection_info
             
         except Exception as e:
             print(f"LLM error: {e}")
-            return ParsedResult(), reference_info, risk_ids, scores
+            return ParsedResult(), reference_info, risk_ids, scores, None
+    
+    async def _apply_self_reflection(self, clause: str, initial_result: ParsedResult) -> tuple:
+        """应用自反思机制
+        
+        Args:
+            clause: 条款原文
+            initial_result: 初次分析结果
+        
+        Returns:
+            tuple: (调整后的 ParsedResult, reflection_info dict)
+        """
+        reflection_info = {
+            "applied": True,
+            "initial_level": initial_result.risk_level,
+            "final_level": initial_result.risk_level,
+            "adjusted": False,
+            "reason": ""
+        }
+        
+        # 构建自反思 Prompt
+        reflection_prompt = SELF_REFLECTION_PROMPT.format(
+            clause_text=clause,
+            risk_level=initial_result.risk_level or "未知",
+            risk_reason=initial_result.risk_name or "",
+            evidence=initial_result.evidence or "无",
+            analysis=initial_result.analysis or ""
+        )
+        
+        try:
+            # 调用 LLM 进行反思
+            reflection_content = await self.llm.achat(reflection_prompt)
+            
+            # 解析反思结果
+            reflection_result = parse_reflection_output(reflection_content)
+            reflection_info["reason"] = reflection_result.get("reason", "")
+            
+            # 如果结论是"调级"，且有新的等级
+            if reflection_result.get("conclusion") == "调级" and reflection_result.get("new_level"):
+                new_level = reflection_result["new_level"]
+                reflection_info["final_level"] = new_level
+                reflection_info["adjusted"] = True
+                
+                # 更新 ParsedResult 的风险等级
+                initial_result.risk_level = new_level
+                
+                # 在分析中添加调级说明
+                adjustment_note = f"\n[二审调级: {reflection_info['initial_level']}→{new_level}，理由: {reflection_info['reason']}]"
+                initial_result.analysis = (initial_result.analysis or "") + adjustment_note
+                
+                print(f"  🔄 自反思调级: {reflection_info['initial_level']} → {new_level}")
+            else:
+                print(f"  ✓ 自反思维持: {initial_result.risk_level}")
+                
+        except Exception as e:
+            print(f"  ⚠️ 自反思失败: {e}")
+            reflection_info["applied"] = False
+        
+        return initial_result, reflection_info
     
     def evaluate_reason(self, clause: str, gt_keywords: List[str], ai_reason: str) -> float:
         """使用算法+语义匹配评估论证质量（替代 LLM-as-a-Judge）
@@ -808,12 +934,20 @@ class AblationBenchmark:
         # 记录开始时间
         start_time = time.time()
         
-        # 分析条款（返回元组：result, reference_info, risk_ids, scores）
-        result, reference_info, matched_risk_ids, matched_scores = await self.analyze_clause(text)
+        # 分析条款（返回元组：result, reference_info, risk_ids, scores, reflection_info）
+        result, reference_info, matched_risk_ids, matched_scores, reflection_info = await self.analyze_clause(text)
         
         # 记录响应时间
         latency = time.time() - start_time
         metrics.total_latency += latency
+        
+        # 自反思统计
+        if reflection_info and reflection_info.get("applied"):
+            metrics.reflection_calls += 1
+            if reflection_info.get("adjusted"):
+                metrics.reflection_adjustments += 1
+            else:
+                metrics.reflection_maintain += 1
         
         metrics.total += 1
         
