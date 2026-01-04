@@ -9,6 +9,12 @@ import sys
 import os
 import time
 
+# ============================================================================
+# 【云端修复】设置 HuggingFace 镜像站，解决连接超时问题
+# ============================================================================
+os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
+
+
 # 目录配置
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 REFLEX_DIR = os.path.join(PROJECT_ROOT, "reflex_web")

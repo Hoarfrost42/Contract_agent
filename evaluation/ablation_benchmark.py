@@ -177,26 +177,27 @@ class EvalMetrics:
     @staticmethod
     def calculate_weighted_score(gt_risk: str, pred_risk: str) -> float:
         """
-        计算加权评分：
-        - 精确匹配：1分
-        - 差一级（高↔中, 中↔低）：0.5分
-        - 差两级（高↔低）：0分
+        计算非对称加权评分 (Asymmetric Weighted Accuracy)：
+        - 精确匹配：1.0分
+        - 防御性误判（低→中, 中→高）：0.8分（宁可错杀）
+        - 风险降级（高→中）：0.4分（漏报扣分更重）
+        - 差两级（高↔低）：0.0分（致命漏判零容忍）
         """
         if gt_risk == pred_risk:
             return 1.0
         
-        level_order = {"高": 2, "中": 1, "低": 0}
-        gt_level = level_order.get(gt_risk, -1)
-        pred_level = level_order.get(pred_risk, -1)
+        # 非对称权重矩阵: weight_matrix[gt][pred]
+        # gt: 高=0, 中=1, 低=2
+        asymmetric_weights = {
+            ("高", "中"): 0.4,  # 高风险降为中：危险，扣分重
+            ("高", "低"): 0.0,  # 高风险降为低：致命漏判
+            ("中", "高"): 0.8,  # 中风险升为高：过度谨慎，可接受
+            ("中", "低"): 0.4,  # 中风险降为低：有一定风险
+            ("低", "中"): 0.8,  # 低风险升为中：防御性误判
+            ("低", "高"): 0.5,  # 低风险升为高：过度报警
+        }
         
-        if gt_level == -1 or pred_level == -1:
-            return 0.0
-        
-        diff = abs(gt_level - pred_level)
-        if diff == 1:
-            return 0.5
-        else:  # diff == 2
-            return 0.0
+        return asymmetric_weights.get((gt_risk, pred_risk), 0.0)
             
     def update_confusion_matrix(self, gt_risk: str, pred_risk: str):
         """更新三分类混淆矩阵"""
@@ -205,29 +206,42 @@ class EvalMetrics:
         pred_idx = level_map.get(pred_risk, 2)
         self.conf_matrix[gt_idx][pred_idx] += 1
 
-    def calculate_kappa(self) -> float:
-        """计算 Quadratic Weighted Kappa (QWK)"""
-        # 权重矩阵 W (3x3)
-        # W_ij = ((i - j) / (N - 1))^2
-        weights = [[0.0] * 3 for _ in range(3)]
-        for i in range(3):
-            for j in range(3):
-                weights[i][j] = ((i - j) / 2.0) ** 2
+    def calculate_kappa(self, use_linear: bool = True) -> float:
+        """
+        计算加权 Kappa
+        
+        Args:
+            use_linear: True=线性权重(LWK), False=二次方权重(QWK)
+        
+        Linear Weighted Kappa 公式: w_ij = 1 - |i-j| / (N-1)
+        对于有序分类更稳健，不会过度惩罚"离群"错误
+        """
+        n_classes = 3
+        weights = [[0.0] * n_classes for _ in range(n_classes)]
+        
+        for i in range(n_classes):
+            for j in range(n_classes):
+                if use_linear:
+                    # Linear Weighted Kappa
+                    weights[i][j] = abs(i - j) / (n_classes - 1)
+                else:
+                    # Quadratic Weighted Kappa (原版)
+                    weights[i][j] = ((i - j) / (n_classes - 1)) ** 2
                 
         # 观察矩阵 O (归一化混淆矩阵)
         total = self.total
         if total == 0: return 0.0
         
-        observed = [[self.conf_matrix[i][j] / total for j in range(3)] for i in range(3)]
+        observed = [[self.conf_matrix[i][j] / total for j in range(n_classes)] for i in range(n_classes)]
         
         # 期望矩阵 E (边缘分布外积)
-        row_sums = [sum(self.conf_matrix[i]) / total for i in range(3)]
-        col_sums = [sum(self.conf_matrix[i][j] for i in range(3)) / total for j in range(3)]
-        expected = [[row_sums[i] * col_sums[j] for j in range(3)] for i in range(3)]
+        row_sums = [sum(self.conf_matrix[i]) / total for i in range(n_classes)]
+        col_sums = [sum(self.conf_matrix[i][j] for i in range(n_classes)) / total for j in range(n_classes)]
+        expected = [[row_sums[i] * col_sums[j] for j in range(n_classes)] for i in range(n_classes)]
         
         # 计算 Kappa = 1 - (sum(W*O) / sum(W*E))
-        numerator = sum(weights[i][j] * observed[i][j] for i in range(3) for j in range(3))
-        denominator = sum(weights[i][j] * expected[i][j] for i in range(3) for j in range(3))
+        numerator = sum(weights[i][j] * observed[i][j] for i in range(n_classes) for j in range(n_classes))
+        denominator = sum(weights[i][j] * expected[i][j] for i in range(n_classes) for j in range(n_classes))
         
         if denominator == 0: return 1.0  # 完全一致
         return 1.0 - (numerator / denominator)
@@ -258,8 +272,32 @@ class EvalMetrics:
             "macro_precision": sum(precisions) / 3,
             "macro_recall": sum(recalls) / 3,
             "macro_f1": sum(f1_scores) / 3,
-            "class_f1": {"High": f1_scores[0], "Medium": f1_scores[1], "Low": f1_scores[2]}
+            "class_f1": {"High": f1_scores[0], "Medium": f1_scores[1], "Low": f1_scores[2]},
+            "class_precision": {"High": precisions[0], "Medium": precisions[1], "Low": precisions[2]},
+            "class_recall": {"High": recalls[0], "Medium": recalls[1], "Low": recalls[2]}
         }
+    
+    def calculate_high_risk_f2(self) -> float:
+        """
+        计算高风险类别的 F2-Score (Recall-Oriented)
+        
+        F2 = (1 + β²) × (P × R) / (β² × P + R)，其中 β = 2
+        F2 分数中 Recall 权重是 Precision 的 2 倍，适合"宁可错杀"的风控场景
+        """
+        # High = index 0 in confusion matrix
+        tp = self.conf_matrix[0][0]
+        fp = sum(self.conf_matrix[i][0] for i in range(3)) - tp
+        fn = sum(self.conf_matrix[0]) - tp
+        
+        precision = tp / (tp + fp) if (tp + fp) > 0 else 0
+        recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+        
+        beta = 2  # F2-Score
+        if (precision + recall) == 0:
+            return 0.0
+        
+        f2 = (1 + beta**2) * (precision * recall) / (beta**2 * precision + recall)
+        return f2
     
     def weighted_accuracy(self) -> float:
         """加权准确率（考虑部分匹配）"""
@@ -325,16 +363,35 @@ class EvalMetrics:
             # 基础指标
             "accuracy": round(self.correct_risk / self.total, 4) if self.total > 0 else 0,
             "weighted_accuracy": round(self.total_weighted_score / self.total, 4) if self.total > 0 else 0,
-            "kappa": round(self.calculate_kappa(), 4),
+            
+            # Kappa 指标 (新增 LWK 和 QWK 对比)
+            "kappa_linear": round(self.calculate_kappa(use_linear=True), 4),  # 线性加权 Kappa (推荐)
+            "kappa_quadratic": round(self.calculate_kappa(use_linear=False), 4),  # 二次方加权 Kappa (对比)
+            "kappa": round(self.calculate_kappa(use_linear=True), 4),  # 默认使用 LWK，保持兼容
             
             # 三分类指标
             "macro_precision": round(macro["macro_precision"], 4),
             "macro_recall": round(macro["macro_recall"], 4),
             "macro_f1": round(macro["macro_f1"], 4),
+            
+            # 高风险 F2-Score (新增 - Recall 优先)
+            "high_risk_f2": round(self.calculate_high_risk_f2(), 4),
+            
+            # 分类别指标
             "class_f1": {
                 "High": round(macro["class_f1"]["High"], 4),
                 "Medium": round(macro["class_f1"]["Medium"], 4),
                 "Low": round(macro["class_f1"]["Low"], 4)
+            },
+            "class_precision": {
+                "High": round(macro["class_precision"]["High"], 4),
+                "Medium": round(macro["class_precision"]["Medium"], 4),
+                "Low": round(macro["class_precision"]["Low"], 4)
+            },
+            "class_recall": {
+                "High": round(macro["class_recall"]["High"], 4),
+                "Medium": round(macro["class_recall"]["Medium"], 4),
+                "Low": round(macro["class_recall"]["Low"], 4)
             },
             
             # 混淆矩阵 (用于绘图)

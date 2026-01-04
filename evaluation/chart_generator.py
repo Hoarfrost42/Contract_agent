@@ -21,17 +21,17 @@ plt.rcParams['axes.unicode_minus'] = False
 CHART_CONFIG = {
     # 第一张图：基础评估指标 (Basic Metrics)
     "chart1_metrics": [
-        {"key": "weighted_accuracy", "name": "加权准确率", "format": "percent"},
+        {"key": "weighted_accuracy", "name": "加权准确率(非对称)", "format": "percent"},
         {"key": "macro_f1", "name": "Macro F1", "format": "percent"},
-        {"key": "kappa", "name": "Kappa 系数", "format": "decimal_scaled"},  # Modified
-        {"key": "risk_id_accuracy", "name": "Risk ID 准确率", "format": "percent"},
+        {"key": "kappa_linear", "name": "Kappa (线性)", "format": "decimal_scaled"},
+        {"key": "high_risk_f2", "name": "高风险 F2", "format": "percent"},
     ],
     # 第二张图：高级评估指标 (Advanced Metrics)
     "chart2_metrics": [
         {"key": "task_success_rate", "name": "任务成功率", "format": "percent"},
         {"key": "hallucination_rate", "name": "幻觉率", "format": "percent"},
         {"key": "rule_recall", "name": "规则召回率", "format": "percent"},
-        {"key": "rule_precision", "name": "规则精确率", "format": "percent"},
+        {"key": "kappa_quadratic", "name": "Kappa (二次方)", "format": "decimal_scaled"},
     ],
     "mode_names": {
         1: "纯LLM",
