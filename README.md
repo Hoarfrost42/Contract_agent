@@ -109,20 +109,19 @@
 |------|------|------|
 | **Mode 1** | 纯 LLM (Raw) | 无 Prompt 模板，直接输入 |
 | **Mode 2** | 基础 Prompt | 格式化 Prompt，无规则引擎 |
-| **Mode 3** | 当前工作流 | Prompt + 规则引擎 |
-| **Mode 4** | 优化工作流 | CoT Prompt + 规则引擎 |
+| **Mode 3** | 当前工作流 | Prompt + 规则引擎 + 自反思 |
+| **Mode 4** | 优化工作流 | CoT Prompt + 规则引擎 + 自反思 |
 
 ### 评测指标
 
 | 指标 | 描述 |
 |------|------|
-| **Weighted Accuracy** | 加权准确率 (精确匹配得1分，偏差一级得0.5分，偏差两级得0分) |
-| **Kappa (QWK)** | 二次加权 Kappa 系数，衡量有序分类的一致性，惩罚严重的错判 |
-| **Macro-F1** | 宏平均 F1 分数，综合衡量 High/Medium/Low 三类的平衡表现 |
-| **Task Success Rate** | 任务成功率 (同时满足解析成功、风险等级可接受、证据有效、有修改建议) |
-| **Hallucination Rate** | 幻觉率 (证据无法在原文中找到的比例) |
-| **Rule Recall** | 规则召回率 (正确触发的规则数 / 应触发的规则数) |
-| **Avg Latency** | 平均单条样本响应时间 (秒) |
+| **High-Risk F2-Score** | **核心安全指标**。F2 分数侧重 Recall (β=2)，贯彻"宁可错杀，不可漏过"的风控原则。 |
+| **Quadratic Kappa (QWK)** | **逻辑一致性指标**。使用二次方权重惩罚跨级错误，衡量模型评级逻辑的稳定性。 |
+| **Weighted Accuracy** | **落地与体验指标**。采用非对称加权矩阵，对防御性误判给予部分分数，对漏判零容忍。 |
+| **Risk ID Precision** | **可信度指标**。衡量模型是否召回了正确的法律/风控规则 ID，而非仅仅蒙对等级。 |
+| **High-Risk Leakage** | **风控红线指标**。统计高风险条款被误判为中风险的比率 (High → Medium)。 |
+| **Hallucination Rate** | **幻觉率**。综合检测证据摘录与法条引用的真实性。 |
 
 ### 运行评测
 
@@ -201,6 +200,8 @@ python start_reflex.py
 | `llm_config.temperature` | `0` | 模型生成的随机度，法律场景建议低值以保准确 |
 | `hybrid_search_config.threshold` | `0.75` | 规则匹配的最低置信度阈值 |
 | `hybrid_search_config.alpha` | `0.65` | 混合检索权重系数 (0.65 代表 65% 语义 + 65% 关键词) |
+| `reranker_config.reflection_high_threshold` | `0.7` | 触发高风险反思的置信度阈值 |
+| `reranker_config.reflection_low_threshold` | `0.5` | 触发低风险反思的置信度阈值 |
 
 ---
 
