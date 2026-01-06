@@ -32,6 +32,9 @@ reranker_config:
   model_name: "BAAI/bge-reranker-v2-m3"  # Reranker 模型名称
   threshold: 0.5  # Rerank 分数阈值，低于此分数的结果将被过滤
   use_fp16: true  # 是否使用 FP16 加速（推荐）
+  # 自反思阈值设置
+  reflection_high_threshold: 0.7  # >= 此值跳过自反思（高置信度）
+  reflection_low_threshold: 0.5   # >= 此值触发自反思（中等置信度）; < 此值为低置信度
 
 # ============= 消融实验评测配置 =============
 ablation_benchmark_config:

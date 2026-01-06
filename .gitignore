@@ -35,24 +35,43 @@ docs/reports/*.docx
 # 评测结果（可选忽略）
 evaluation/results/
 
-# 辅助数据（可选）
+# 忽略所有数据目录
 Evaldata/
 
-# macOS
-.DS_Store
+# 忽略复现与工具脚本
+extract_metrics.py
+debug_timeout.py
+check_*.py
+import_new_laws.py
+reimport_laws.py
+evaluation/plot_*.py
 
-# Windows
-Thumbs.db
-
-# new added
+# 评测结果：默认忽略所有
+evaluation/results/
 evaluation/results_*/
-check_classifier.py
-reflex_web/.web/
+evaluation/results*.json
+
+# 评测结果：白名单（仅保留数据集、模板、摘要和图表）
+!evaluation/llm_benchmark_dataset.json
+!evaluation/benchmark_template.json
+!evaluation/best/metrics_summary.json
+!evaluation/best/charts/
+
+# 忽略具体的详细结果文件
+evaluation/best/ablation_results.json
+
+# 忽略临时图表目录（best下的已经在上面保留）
+evaluation/charts/
+
+# 日志
 *.log
+
+# 项目特定的忽略
+reflex_web/.web/
 LABOR.json
 SALES.json
 LEASE.json
 GENERAL.json
-evaluation/charts/
+
 __pycache__/
 *.pyc

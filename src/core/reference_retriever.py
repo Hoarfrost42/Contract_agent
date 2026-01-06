@@ -28,6 +28,7 @@ class ReferenceResult:
     scores: List[float]          # 置信度分数列表（rerank 后）
     match_source: str            # 匹配来源: "reranked" | "topk_match" | "no_match"
     reranked: bool = False       # 是否经过 rerank
+    pre_filter_max_score: float = 0.0  # 阈值过滤前的最高分数（用于调试）
     
     @property
     def has_match(self) -> bool:
@@ -135,7 +136,8 @@ class ReferenceRetriever:
             
             # ========== Step 2: Rerank（可选）==========
             reranked = False
-            if self.use_rerank and self.reranker is not None and len(rules) > 1:
+            # 改为 >= 1，即使只有1条结果也进行 Rerank 验证分数
+            if self.use_rerank and self.reranker is not None and len(rules) >= 1:
                 try:
                     reranked_results = self.reranker.rerank(
                         query=clause_text,
@@ -163,8 +165,9 @@ class ReferenceRetriever:
                 
                 if not filtered:
                     # 关键：Rerank 后没有通过阈值的结果，给 Prompt 明确信号
-                    print(f"⚠️ Rerank 后所有结果分数 < {self.rerank_threshold}，返回空参考信息")
-                    return self._empty_result_with_signal()
+                    pre_filter_max = max(scores) if scores else 0.0
+                    print(f"⚠️ Rerank 后所有结果分数 < {self.rerank_threshold}，最高分: {pre_filter_max:.2f}，返回空参考信息")
+                    return self._empty_result_with_signal(pre_filter_max_score=pre_filter_max)
                 
                 # 截取 top_k
                 filtered = filtered[:self.top_k]
@@ -241,25 +244,21 @@ class ReferenceRetriever:
             reranked=False
         )
     
-    def _empty_result_with_signal(self) -> ReferenceResult:
+    def _empty_result_with_signal(self, pre_filter_max_score: float = 0.0) -> ReferenceResult:
         """
-        返回带有明确信号的空结果（Rerank 后无高分匹配）
+        返回空结果（Rerank 后无高分匹配）
         
-        关键：告诉 Prompt 这是经过检索但未找到匹配的情况，
-        模型应基于通用法律常识判断，而非幻觉。
+        严格返回"无"，让 Prompt 的"空上下文"规则生效。
+        保留过滤前的最高分数用于调试。
         """
-        empty_signal = (
-            "无（经检索和相关性评估后，未发现与当前条款匹配的风险规则。"
-            "请基于《劳动合同法》等通用法律常识判断是否存在明显违法点。"
-            "若无明显违法，应判定为低风险。）"
-        )
         return ReferenceResult(
-            reference_info=empty_signal,
+            reference_info="无",
             law_contents=[],
             risk_ids=[],
             scores=[],
             match_source="rerank_filtered",
-            reranked=True
+            reranked=True,
+            pre_filter_max_score=pre_filter_max_score
         )
     
     def retrieve_single(self, clause_text: str) -> Tuple[Optional[dict], float, str]:

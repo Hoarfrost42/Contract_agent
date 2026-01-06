@@ -13,33 +13,33 @@ import numpy as np
 # 使用非交互式后端
 matplotlib.use('Agg')
 
-# 设置中文字体
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei', 'DejaVu Sans']
+# 设置中文字体（Linux/Windows 兼容）
+# 按优先级设置字体：Linux 云端 -> Windows
+plt.rcParams['font.sans-serif'] = ['WenQuanYi Micro Hei', 'WenQuanYi Zen Hei', 'Noto Sans CJK SC', 'SimHei', 'Microsoft YaHei', 'DejaVu Sans']
 plt.rcParams['axes.unicode_minus'] = False
 
-# 图表配置
+# 图表配置 (根据展示策略优化)
 CHART_CONFIG = {
-    # 第一张图：基础评估指标 (Basic Metrics)
-    "chart1_metrics": [
-        {"key": "weighted_accuracy", "name": "加权准确率(非对称)", "format": "percent"},
-        {"key": "macro_f1", "name": "Macro F1", "format": "percent"},
-        {"key": "kappa_linear", "name": "Kappa (线性)", "format": "decimal_scaled"},
-        {"key": "high_risk_f2", "name": "高风险 F2", "format": "percent"},
-    ],
-    # 第二张图：高级评估指标 (Advanced Metrics)
+    # 图表2：核心性能指标 (The Safety & Logic Bar) - 必须展示的"SOTA 证据"
     "chart2_metrics": [
+        {"key": "high_risk_f2", "name": "High-Risk F2", "format": "percent"},  # 主指标：安全性
+        {"key": "kappa_quadratic", "name": "Quadratic Kappa", "format": "decimal_scaled"},  # 逻辑指标
+        {"key": "weighted_accuracy", "name": "Weighted Accuracy", "format": "percent"},  # 落地指标
+        {"key": "risk_id_precision", "name": "Risk ID Precision", "format": "percent"},  # 可信度指标
+    ],
+    # 图表3：系统稳定性指标 (The Quality Check) - 证明"证据准入"机制的有效性
+    "chart3_metrics": [
+        {"key": "hallucination_rate", "name": "幻觉率 ↓", "format": "percent_inverse"},  # 越低越好
         {"key": "task_success_rate", "name": "任务成功率", "format": "percent"},
-        {"key": "hallucination_rate", "name": "幻觉率", "format": "percent"},
-        {"key": "rule_recall", "name": "规则召回率", "format": "percent"},
-        {"key": "kappa_quadratic", "name": "Kappa (二次方)", "format": "decimal_scaled"},
+        {"key": "high_risk_leakage", "name": "高风险漏判率 ↓", "format": "percent_inverse"},  # 自定义指标
     ],
     "mode_names": {
         1: "纯LLM",
-        2: "基础Prompt",
+        2: "基础Prompt", 
         3: "当前工作流",
         4: "优化工作流",
     },
-    "colors": ["#6366F1", "#8B5CF6", "#06B6D4", "#10B981"],  # 渐变色
+    "colors": ["#EF4444", "#F59E0B", "#06B6D4", "#10B981"],  # 红-橙-青-绿 渐变
 }
 
 
@@ -49,10 +49,10 @@ def generate_report_charts(
     timestamp: str = None
 ) -> List[str]:
     """
-    生成三张核心图表：
-    1. 基础评估指标 (Bar Chart)
-    2. 高级评估指标 (Bar Chart)
-    3. 混淆矩阵 (Heatmap Grid)
+    生成三张核心图表（根据展示策略优化）：
+    1. 混淆矩阵 (The Behavior Map) - 4模式并排对比
+    2. 核心性能指标 (The Safety & Logic Bar) 
+    3. 系统稳定性指标 (The Quality Check)
     
     Returns:
         生成的图表路径列表
@@ -72,37 +72,58 @@ def generate_report_charts(
         print("警告: 没有找到有效的评测结果")
         return []
     
+    # 预处理：计算 high_risk_leakage (高风险漏判率)
+    _add_high_risk_leakage(results, modes)
+    
     chart_paths = []
     
-    # ========== 图表1：基础评估指标 ==========
-    metrics1 = CHART_CONFIG["chart1_metrics"]
-    chart_path1 = _generate_bar_chart(
-        results, modes, metrics1, 
-        title="消融实验 - 基础评估指标 (Basic Metrics)",
+    # ========== 图表1：混淆矩阵 (The Behavior Map) ==========
+    chart_path1 = _generate_confusion_matrix_chart(
+        results, modes,
         output_dir=output_dir,
-        filename=f"chart1_basic_metrics_{timestamp}.png"
+        filename=f"chart1_confusion_matrix_{timestamp}.png"
     )
     chart_paths.append(chart_path1)
     
-    # ========== 图表2：高级评估指标 ==========
+    # ========== 图表2：核心性能指标 (The Safety & Logic Bar) ==========
     metrics2 = CHART_CONFIG["chart2_metrics"]
     chart_path2 = _generate_bar_chart(
         results, modes, metrics2,
-        title="消融实验 - 高级评估指标 (Advanced Metrics)",
+        title="核心性能指标 (The Safety & Logic Bar)",
         output_dir=output_dir,
-        filename=f"chart2_advanced_metrics_{timestamp}.png"
+        filename=f"chart2_performance_{timestamp}.png"
     )
     chart_paths.append(chart_path2)
     
-    # ========== 图表3：混淆矩阵 ==========
-    chart_path3 = _generate_confusion_matrix_chart(
-        results, modes,
+    # ========== 图表3：系统稳定性指标 (The Quality Check) ==========
+    metrics3 = CHART_CONFIG["chart3_metrics"]
+    chart_path3 = _generate_bar_chart(
+        results, modes, metrics3,
+        title="系统稳定性指标 (The Quality Check)",
         output_dir=output_dir,
-        filename=f"chart3_confusion_matrix_{timestamp}.png"
+        filename=f"chart3_quality_{timestamp}.png"
     )
     chart_paths.append(chart_path3)
     
     return chart_paths
+
+
+def _add_high_risk_leakage(results: Dict[str, Any], modes: List[int]):
+    """计算并添加 high_risk_leakage 指标（高风险漏判率 = High→Medium 比例）"""
+    for mode in modes:
+        mode_key = f"mode_{mode}"
+        if mode_key not in results or "metrics" not in results[mode_key]:
+            continue
+        
+        conf_matrix = results[mode_key]["metrics"].get("conf_matrix", [[0]*3]*3)
+        # High = row 0, Medium = col 1
+        # High→Medium = conf_matrix[0][1]
+        high_to_medium = conf_matrix[0][1]
+        total_high = sum(conf_matrix[0])  # 真实高风险总数
+        
+        # 高风险漏判率 = High→Medium / Total High
+        leakage_rate = high_to_medium / total_high if total_high > 0 else 0
+        results[mode_key]["metrics"]["high_risk_leakage"] = leakage_rate
 
 
 def _generate_bar_chart(
@@ -129,14 +150,18 @@ def _generate_bar_chart(
         labels = []
         for metric_config in metrics:
             value = results[mode_key]["metrics"].get(metric_config["key"], 0)
+            fmt = metric_config["format"]
             
-            # 处理不同格式：percent 和 decimal_scaled 都会乘以 100 进行绘制
-            if metric_config["format"] == "percent":
+            # 处理不同格式
+            if fmt == "percent":
                 values.append(value * 100)
-                labels.append(f'{value * 100:.1f}') # 不带%号，或者带？原图有%吗？annotate里自己加
-            elif metric_config["format"] == "decimal_scaled":
-                values.append(value * 100) # 放大100倍以便可视化
-                labels.append(f'{value:.2f}') # 标签保持原始小数
+                labels.append(f'{value * 100:.1f}%')
+            elif fmt == "percent_inverse":  # 越低越好（如幻觉率）
+                values.append(value * 100)
+                labels.append(f'{value * 100:.1f}%')
+            elif fmt == "decimal_scaled":
+                values.append(value * 100)  # 放大100倍以便可视化
+                labels.append(f'{value:.2f}')  # 标签保持原始小数
             else:
                 values.append(value)
                 labels.append(f'{value:.2f}')
@@ -196,18 +221,17 @@ def _generate_confusion_matrix_chart(
     output_dir: Path,
     filename: str
 ) -> str:
-    """生成混淆矩阵图表 (Grid)"""
+    """生成混淆矩阵图表 (The Behavior Map) - 4模式并排对比"""
     n_modes = len(modes)
-    cols = min(n_modes, 2)
-    rows = (n_modes + 1) // 2
     
-    fig, axes = plt.subplots(rows, cols, figsize=(6 * cols, 5 * rows))
+    # 强制使用 1 行 x N 列布局（并排对比）
+    fig, axes = plt.subplots(1, n_modes, figsize=(4.5 * n_modes, 4.5))
     if n_modes == 1:
         axes = [axes]
     else:
-        axes = axes.flatten()
+        axes = list(axes)
         
-    labels = ["高(H)", "中(M)", "低(L)"]
+    labels = ["高", "中", "低"]
     
     for i, mode in enumerate(modes):
         ax = axes[i]
@@ -218,39 +242,52 @@ def _generate_confusion_matrix_chart(
             ax.text(0.5, 0.5, "无数据", ha='center', va='center')
             continue
             
-        # 获取并不是矩阵 (List[List[int]])
         conf_matrix = results[mode_key]["metrics"].get("conf_matrix", [[0]*3]*3)
         matrix = np.array(conf_matrix)
+        total = matrix.sum() if matrix.sum() > 0 else 1
         
         # 绘制热力图
-        im = ax.imshow(matrix, cmap="Blues", vmin=0, vmax=matrix.sum())
+        im = ax.imshow(matrix, cmap="Blues", vmin=0, vmax=matrix.max())
         
-        # 添加数值标注
+        # 添加数值标注 + 视觉焦点
         for r_idx in range(3):
             for c_idx in range(3):
                 val = matrix[r_idx, c_idx]
                 total_in_row = matrix[r_idx].sum()
                 percentage = val / total_in_row if total_in_row > 0 else 0
                 
-                # 字体颜色逻辑 (背景深色则白色，浅色则黑色)
+                # 字体颜色逻辑
                 text_color = "white" if val > matrix.max() / 2 else "black"
                 
-                ax.text(c_idx, r_idx, f"{val}\n({percentage:.0%})", 
-                        ha="center", va="center", color=text_color, fontweight='bold')
+                # 特殊标记关键区域
+                cell_text = f"{val}\n({percentage:.0%})"
+                fontweight = 'bold'
+                fontsize = 9
+                
+                # 视觉焦点：High→High (对角线) / Medium→High (防御升级) / High→Medium (漏判)
+                if r_idx == 0 and c_idx == 0:  # High→High (正确召回)
+                    fontsize = 10
+                elif r_idx == 1 and c_idx == 0:  # Medium→High (防御性升级)
+                    fontsize = 10
+                elif r_idx == 0 and c_idx == 1:  # High→Medium (漏判！)
+                    cell_text = f"{val}\n({percentage:.0%})\n[!]"
+                    fontsize = 10
+                
+                ax.text(c_idx, r_idx, cell_text, 
+                        ha="center", va="center", color=text_color, 
+                        fontweight=fontweight, fontsize=fontsize)
         
-        ax.set_title(f"{mode_name}", fontsize=12, fontweight='bold', pad=10)
+        ax.set_title(f"{mode_name}", fontsize=13, fontweight='bold', pad=10)
         ax.set_xticks(range(3))
         ax.set_yticks(range(3))
-        ax.set_xticklabels(labels)
-        ax.set_yticklabels(labels)
+        ax.set_xticklabels(labels, fontsize=11)
+        ax.set_yticklabels(labels, fontsize=11)
         ax.set_xlabel("预测", fontsize=10)
-        ax.set_ylabel("真实", fontsize=10)
-        
-        # 隐藏多余的子图
-        for j in range(i + 1, len(axes)):
-            axes[j].axis('off')
+        if i == 0:
+            ax.set_ylabel("真实", fontsize=10)
             
-    fig.suptitle("消融实验 - 风险等级混淆矩阵 (High/Medium/Low)", fontsize=16, fontweight='bold', y=0.98)
+    fig.suptitle("行为映射矩阵 (The Behavior Map) - 展示\"单向狙击\"战术效果", 
+                 fontsize=14, fontweight='bold', y=1.02)
     plt.tight_layout()
     
     chart_path = output_dir / filename

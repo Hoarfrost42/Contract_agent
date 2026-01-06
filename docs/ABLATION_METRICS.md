@@ -1,27 +1,48 @@
 # 消融实验评测指标文档
 
-本文档详细说明消融实验 (`evaluation/ablation_benchmark.py`) 中使用的所有评测指标及其计算公式。
+本文档详细说明消融实验图表生成器 (`chart_generator.py`) 中使用的核心评测指标及其计算公式。
 
 ---
 
-## 一、风险等级评估指标
+## 一、核心性能指标 (The Safety & Logic Bar)
 
-### 1.1 Accuracy (精确准确率)
+### 1.1 High-Risk F2-Score ⭐ 主指标
 
 ```
-Accuracy = correct_risk / total
+F2 = (1 + β²) × (P × R) / (β² × P + R)，其中 β = 2
 ```
 
-- 仅精确匹配计分：高=高、中=中、低=低
-- 差一级或两级均视为错误
+- **侧重 Recall**：F2 分数中 Recall 权重是 Precision 的 2 倍。
+- **设计理念**：在风控场景下，"宁可错杀，不可漏过"。
+- **计算范围**：仅针对 **High** 风险类别计算。
 
-### 1.2 Weighted Accuracy (非对称加权准确率) ⭐ 已更新
+### 1.2 Quadratic Weighted Kappa (QWK) ⭐ 逻辑指标
+
+```
+Kappa = 1 - Σ(W × O) / Σ(W × E)
+
+二次方权重公式: w_ij = (i - j)² / (N - 1)²
+```
+
+**二次方权重矩阵 W (QWK)**：
+
+```
+           pred高  pred中  pred低
+gt高      [ 0.0,   0.25,  1.0  ]
+gt中      [ 0.25,  0.0,   0.25 ]
+gt低      [ 1.0,   0.25,  0.0  ]
+```
+
+- **惩罚差异**：对"离群"错误（如 High→Low）给予极重的惩罚（是相邻错误的4倍）。
+- **作用**：衡量模型风险评级逻辑的一致性，惩罚严重的逻辑跳跃。
+
+### 1.3 Weighted Accuracy (非对称加权准确率) ⭐ 落地指标
 
 ```
 Weighted_Accuracy = Σ weighted_score / total
 ```
 
-**非对称加权评分规则**（2024.01 更新）：
+**非对称加权评分规则**：
 
 | Ground Truth | Prediction | Score | 理由 |
 |--------------|------------|-------|------|
@@ -35,71 +56,18 @@ Weighted_Accuracy = Σ weighted_score / total
 | 低 | 中 | **0.8** | 防御性误判 |
 | 低 | 低 | 1.0 | 精确匹配 |
 
-> **设计理念**：在风控场景下，"漏报"远比"虚警"严重。因此对"风险降级"行为（High→Medium, High→Low）给予更重的扣分。
-
-### 1.3 Linear Weighted Kappa (LWK) ⭐ 推荐使用
+### 1.4 Risk ID Precision (规则匹配精确率) ⭐ 可信度指标
 
 ```
-Kappa = 1 - Σ(W × O) / Σ(W × E)
-
-线性权重公式: w_ij = |i - j| / (N - 1)
+Risk_ID_Precision = risk_id_correct / risk_id_total
 ```
 
-**线性权重矩阵 W (LWK)**：
-
-```
-           pred高  pred中  pred低
-gt高      [ 0.0,   0.5,   1.0  ]
-gt中      [ 0.5,   0.0,   0.5  ]
-gt低      [ 1.0,   0.5,   0.0  ]
-```
-
-> **为什么用 LWK 替代 QWK**：QWK 使用二次方惩罚，对"离群"错误惩罚极重（错两档惩罚是错一档的4倍），导致 Kappa 值极低。LWK 使用线性惩罚，对有序分类更稳健。
-
-### 1.4 High-Risk F2-Score ⭐ 新增
-
-```
-F2 = (1 + β²) × (P × R) / (β² × P + R)，其中 β = 2
-```
-
-- F2 分数中 Recall 权重是 Precision 的 2 倍
-- 适合"宁可错杀，不可漏过"的风控场景
-- 仅针对 High 风险类别计算
-
-### 1.5 Macro F1 / Precision / Recall
-
-对高、中、低三类分别计算 F1，然后取平均：
-
-```
-Macro_F1 = (F1_高 + F1_中 + F1_低) / 3
-
-# 单类计算
-TP = conf_matrix[k][k]
-FP = Σ conf_matrix[i][k] - TP  (其他类被误判为 k)
-FN = Σ conf_matrix[k][j] - TP  (k 类被误判为其他)
-
-Precision_k = TP / (TP + FP)
-Recall_k = TP / (TP + FN)
-F1_k = 2 × P × R / (P + R)
-```
-
-### 1.5 Class F1 (分类别 F1)
-
-除了 Macro F1 外，还输出每个风险等级的单独 F1 分数：
-
-```json
-"class_f1": {
-    "High": 0.75,    // 高风险类别的 F1
-    "Medium": 0.62,  // 中风险类别的 F1
-    "Low": 0.88      // 低风险类别的 F1
-}
-```
-
-用于分析模型在哪个风险等级上表现较弱。
+- 检测检索到的 `risk_id` 是否与 Ground Truth 标注一致。
+- 反映模型是否"找对了规则"，而不仅仅是蒙对了风险等级。
 
 ---
 
-## 二、幻觉检测指标
+## 二、系统稳定性指标 (The Quality Check)
 
 ### 2.1 Hallucination Rate (综合幻觉率)
 
@@ -107,91 +75,36 @@ F1_k = 2 × P × R / (P + R)
 Hallucination_Rate = evidence_invalid / (evidence_valid + evidence_invalid)
 ```
 
-### 2.2 Clause Hallucination Rate (条款证据幻觉率)
+- 检测 LLM 输出的"证据摘录"及"法条引用"是否真实存在。
+- **目标**：越低越好。
 
-```
-Clause_Hallucination = clause_invalid / (clause_valid + clause_invalid)
-```
-
-检测 LLM 输出的"证据摘录"是否真实存在于原条款中。
-
-### 2.3 Law Hallucination Rate (法条引用幻觉率)
-
-```
-Law_Hallucination = law_invalid / (law_valid + law_invalid)
-```
-
-检测 LLM 引用的法律条文是否真实存在。
-
-**两阶段检测流程** (`verify_evidence`):
-
-1. **Stage 1**: Embedding 召回 (BGE-Small) → 选出 Top-3 候选句子
-2. **Stage 2**: Reranker 精排 (BGE-Reranker) → 分数 ≥ threshold 则有效
-
----
-
-## 三、规则触发一致性指标
-
-### 3.1 Rule Recall (规则召回率)
-
-```
-Rule_Recall = rule_correct / rule_target
-```
-
-- `rule_target`: Ground Truth 中标注的应触发规则数
-- `rule_correct`: 系统正确触发的规则数
-
-### 3.2 Rule Precision (规则精确率)
-
-```
-Rule_Precision = rule_correct / rule_trigger
-```
-
-- `rule_trigger`: 系统实际触发的规则数
-
-### 3.3 Risk ID Accuracy
-
-```
-Risk_ID_Accuracy = risk_id_match / risk_id_total
-```
-
-检测检索到的 `risk_id` 是否与 Ground Truth 标注一致。
-
----
-
-## 四、综合任务指标
-
-### 4.1 Task Success Rate (任务成功率)
+### 2.2 Task Success Rate (任务成功率)
 
 ```
 Task_Success_Rate = success_count / total
 ```
 
 完全成功需同时满足：
-- 解析成功 (`parse_success`)
-- 风险等级正确
-- 证据有效 (非幻觉)
-- 有修改建议
+1. 解析成功
+2. 风险等级正确
+3. 证据有效 (非幻觉)
+4. 输出合规
 
-### 4.2 Parse Rate (解析成功率)
-
-```
-Parse_Rate = parse_success / total
-```
-
-LLM 输出是否符合预期的 Markdown 格式。
-
-### 4.3 Avg Latency (平均响应时间)
+### 2.3 High-Risk Leakage (高风险漏判率) ⭐ 风控红线
 
 ```
-Avg_Latency = total_latency / total  (秒)
+High_Risk_Leakage = Count(High → Medium) / Total(High)
 ```
+
+- **定义**：真实为**高风险**的条款，被误判为**中风险**的比例。
+- **High → Low** 通常被视为不可接受的错误（权重0），而 **High → Medium** 往往是模型为了"讨好"用户而做出的妥协，是风控系统中最隐蔽的漏洞。
+- **目标**：越低越好。
 
 ---
 
-## 五、混淆矩阵
+## 三、行为映射矩阵 (Map)
 
-三分类混淆矩阵结构：
+### 3.1 混淆矩阵 (Confusion Matrix)
 
 ```
                 预测
@@ -201,13 +114,4 @@ Avg_Latency = total_latency / total  (秒)
        低   [ E_LH, E_LM, TP_L ]
 ```
 
-- **对角线**: 正确分类数
-- **非对角线**: 错误分类数
-
-用于生成 Heatmap 可视化图表。
-
----
-
-## 代码位置
-
-所有指标定义于 `evaluation/ablation_benchmark.py` 的 `EvalMetrics` 类 (L130-L360)。
+- **可视化**：用于生成 Heatmap，直观展示模型的行为倾向（如是否过度防御、是否存在严重的漏判）。
